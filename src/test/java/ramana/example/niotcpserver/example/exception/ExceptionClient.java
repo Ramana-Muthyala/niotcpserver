@@ -25,10 +25,5 @@ public class ExceptionClient {
         public void onRead(Context.OnRead context, Object data) throws InternalException {
             logger.info("Received: " + Util.toString(data));
         }
-
-        @Override
-        public void onReadComplete(Context.OnRead context, Object data) throws InternalException {
-            context.close();
-        }
     }
 }

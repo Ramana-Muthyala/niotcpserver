@@ -57,6 +57,7 @@ public class InternalChannelHandler {
                 }
                 context.channelHandlerMethodName = ChannelHandlerMethodName.onReadComplete;
                 channelHandlerNode.value.onReadComplete(context, null);
+                onClose(context);
             } else {
                 channelHandlerNode.value.onRead(context, data);
             }

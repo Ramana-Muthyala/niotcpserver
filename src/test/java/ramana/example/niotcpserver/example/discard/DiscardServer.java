@@ -1,9 +1,7 @@
 package ramana.example.niotcpserver.example.discard;
 
 import ramana.example.niotcpserver.Bootstrap;
-import ramana.example.niotcpserver.handler.Context;
 import ramana.example.niotcpserver.handler.impl.ChannelHandlerAdapter;
-import ramana.example.niotcpserver.types.InternalException;
 
 public class DiscardServer {
 
@@ -16,9 +14,6 @@ public class DiscardServer {
     }
 
     public static class ChannelHandler extends ChannelHandlerAdapter {
-        @Override
-        public void onReadComplete(Context.OnRead context, Object data) throws InternalException {
-            context.close();
-        }
+        // No overriding of any methods required
     }
 }

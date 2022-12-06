@@ -47,10 +47,5 @@ public class PipeServer {
             onReadContext.write(data);
             onReadContext.close();
         }
-
-        @Override
-        public void onReadComplete(Context.OnRead context, Object data) throws InternalException {
-            context.close();
-        }
     }
 }

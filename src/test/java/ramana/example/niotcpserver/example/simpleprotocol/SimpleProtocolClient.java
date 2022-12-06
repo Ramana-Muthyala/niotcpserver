@@ -42,11 +42,6 @@ public class SimpleProtocolClient {
             context.flush();
         }
 
-        @Override
-        public void onReadComplete(Context.OnRead context, Object data) throws InternalException {
-            context.close();
-        }
-
         private void write0(Context.OnRead context) throws InternalException {
             Allocator.Resource<ByteBuffer> resource = context.allocator().allocate(1024);
             ByteBuffer buffer = resource.get();

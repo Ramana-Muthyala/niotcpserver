@@ -27,10 +27,5 @@ public class HelloClient {
             context.write(data);
             context.flush();
         }
-
-        @Override
-        public void onReadComplete(Context.OnRead context, Object data) throws InternalException {
-            context.close();
-        }
     }
 }
