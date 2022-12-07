@@ -49,11 +49,6 @@ public class ChannelOperations {
                 &&  (System.currentTimeMillis() - closeTicker) < closeTimeout) return;
         releaseResources();
         try {
-            channel.shutdownOutput();
-        } catch (OutOfMemoryError | IOError | IOException exception) {
-            logger.log(Level.INFO, exception.getMessage(), exception);
-        }
-        try {
             channel.close();
         } catch (OutOfMemoryError | IOError | IOException exception) {
             logger.log(Level.INFO, exception.getMessage(), exception);
