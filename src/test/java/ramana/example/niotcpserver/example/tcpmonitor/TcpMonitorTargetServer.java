@@ -1,4 +1,4 @@
-package ramana.example.niotcpserver.example.negativetests.tcpmonitor;
+package ramana.example.niotcpserver.example.tcpmonitor;
 
 import ramana.example.niotcpserver.Bootstrap;
 import ramana.example.niotcpserver.handler.Context;

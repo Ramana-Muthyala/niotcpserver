@@ -83,7 +83,6 @@ public class ClientWorker extends AbstractWorker {
             }
         } finally {
             cleanUp();
-            logger.info("ClientWorker exiting. Current thread: " + Thread.currentThread().getName());
         }
     }
 

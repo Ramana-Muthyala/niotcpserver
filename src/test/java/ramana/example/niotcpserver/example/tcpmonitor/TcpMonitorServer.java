@@ -1,4 +1,4 @@
-package ramana.example.niotcpserver.example.negativetests.tcpmonitor;
+package ramana.example.niotcpserver.example.tcpmonitor;
 
 import ramana.example.niotcpserver.Bootstrap;
 import ramana.example.niotcpserver.Client;
@@ -7,7 +7,7 @@ import ramana.example.niotcpserver.handler.impl.ChannelHandlerAdapter;
 import ramana.example.niotcpserver.types.InternalException;
 import ramana.example.niotcpserver.util.CompletionSignal;
 
-public class TcpMonitor {
+public class TcpMonitorServer {
 
     public static void main(String[] args) {
         new Bootstrap().listen(8080)
