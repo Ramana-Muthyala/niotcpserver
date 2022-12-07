@@ -33,6 +33,7 @@ public class NegativeTestServer {
             context.write(resource);
             context.flush();
             context.next(data);
+            context.write("Hello World !!");   // This will be ignored
             context.close();   // This will be ignored
         }
 

@@ -75,15 +75,21 @@ public class Client {
     public void run() {
         validate();
         SelectorProvider provider = SelectorProvider.provider();
-        new ClientWorker(this, null, provider).run();
+        new ClientWorker(this, null, null, provider).run();
     }
 
-    public void start() throws CompletionSignal.CompletionSignalException, InterruptedException {
+    public void start() {
         validate();
         SelectorProvider provider = SelectorProvider.provider();
-        CompletionSignal signal = new CompletionSignal(1);
-        new Thread(new ClientWorker(this, signal, provider)).start();
-        signal.doWait();
+        new Thread(new ClientWorker(this, null, null, provider)).start();
+    }
+
+    public void startAndWaitForOnConnectSignal() throws CompletionSignal.CompletionSignalException, InterruptedException {
+        validate();
+        SelectorProvider provider = SelectorProvider.provider();
+        CompletionSignal onConnectSignal = new CompletionSignal(1);
+        new Thread(new ClientWorker(this, null, onConnectSignal, provider)).start();
+        onConnectSignal.doWait();
     }
 
     public Client enableLogging() {

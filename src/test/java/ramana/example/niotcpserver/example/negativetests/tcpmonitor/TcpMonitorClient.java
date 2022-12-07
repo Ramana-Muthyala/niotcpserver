@@ -1,4 +1,4 @@
-package ramana.example.niotcpserver.example.echo;
+package ramana.example.niotcpserver.example.negativetests.tcpmonitor;
 
 import ramana.example.niotcpserver.Client;
 import ramana.example.niotcpserver.handler.Context;
@@ -6,21 +6,17 @@ import ramana.example.niotcpserver.handler.impl.ChannelHandlerAdapter;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.log.LogFactory;
 import ramana.example.niotcpserver.types.InternalException;
-import ramana.example.niotcpserver.types.Pair;
-import ramana.example.niotcpserver.util.CompletionSignal;
 import ramana.example.niotcpserver.util.Util;
 
-import java.net.SocketOption;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
-public class EchoClientNoDefaultRead {
+public class TcpMonitorClient {
     private static final Logger logger = LogFactory.getLogger();
 
-    public static void main(String[] args) throws CompletionSignal.CompletionSignalException, InterruptedException {
-        Pair<SocketOption, Object>[] socketOptions = new Pair[]{};
+    public static void main(String[] args) {
         new Client().connect("localhost", 8080)
-                .socketOptions(socketOptions)
+                .enableDefaultRead()
                 .enableLogging()
                 .channelHandler(new ChannelHandler())
                 .run();
@@ -35,7 +31,6 @@ public class EchoClientNoDefaultRead {
             buffer.put(greeting.getBytes());
             context.write(resource);
             context.flush();
-            context.fireReadInterest();
         }
 
         @Override

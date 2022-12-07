@@ -6,7 +6,7 @@ import ramana.example.niotcpserver.handler.Context;
 import ramana.example.niotcpserver.handler.impl.ChannelHandlerAdapter;
 import ramana.example.niotcpserver.types.InternalException;
 
-public class PipeServer {
+public class SyncPipeServer {
     public static void main(String[] args) {
         new Bootstrap().listen(8080)
                 .enableDefaultRead()

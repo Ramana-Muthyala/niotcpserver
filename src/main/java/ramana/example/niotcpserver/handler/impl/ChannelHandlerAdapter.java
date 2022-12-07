@@ -5,7 +5,6 @@ import ramana.example.niotcpserver.handler.Context;
 import ramana.example.niotcpserver.types.InternalException;
 
 public class ChannelHandlerAdapter implements ChannelHandler {
-
     @Override
     public void onConnect(Context.OnConnect context, Object data) throws InternalException {
         context.next(data);

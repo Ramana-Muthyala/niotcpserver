@@ -1,4 +1,4 @@
-package ramana.example.niotcpserver.example.pipe;
+package ramana.example.niotcpserver.example.negativetests.tcpmonitor;
 
 import ramana.example.niotcpserver.Bootstrap;
 import ramana.example.niotcpserver.handler.Context;
@@ -9,7 +9,7 @@ import ramana.example.niotcpserver.util.Util;
 
 import java.nio.ByteBuffer;
 
-public class PipeTargetServer {
+public class TcpMonitorTargetServer {
 
     public static void main(String[] args) {
         new Bootstrap().listen(8081)
@@ -26,7 +26,7 @@ public class PipeTargetServer {
             ByteBuffer byteBuffer = resource.get();
             String receivedData = Util.toString(data);
             byteBuffer.clear(); // reuse
-            byteBuffer.put(("PipeTargetServer: Echoing: " + receivedData).getBytes());
+            byteBuffer.put(("TcpMonitorTargetServer: Echoing: " + receivedData).getBytes());
             context.write(resource);
             context.close();
         }

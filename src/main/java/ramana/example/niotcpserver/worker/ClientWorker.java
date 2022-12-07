@@ -21,11 +21,13 @@ import java.util.logging.Level;
 
 public class ClientWorker extends AbstractWorker {
     private final Client client;
+    private final CompletionSignal onConnectSignal;
     private SocketChannel channel;
     private final ClientAllocator allocator = new ClientAllocator();
 
-    public ClientWorker(Client client, CompletionSignal initSignal, SelectorProvider provider) {
+    public ClientWorker(Client client, CompletionSignal initSignal, CompletionSignal onConnectSignal, SelectorProvider provider) {
         super(initSignal, provider, client.getSocketOptions(), client.isLoggingEnabled());
+        this.onConnectSignal = onConnectSignal;
         this.client = client;
     }
 
@@ -37,6 +39,7 @@ public class ClientWorker extends AbstractWorker {
                 channel.finishConnect();
                 sk.interestOps(sk.interestOps() & (~SelectionKey.OP_CONNECT));
                 internalChannelHandler.onConnect(sk);
+                if(onConnectSignal != null) onConnectSignal.complete();
                 if(!channel.isOpen()) doWork = false;
                 return;
             }
@@ -65,10 +68,12 @@ public class ClientWorker extends AbstractWorker {
             InternalChannelHandler internalChannelHandler = new InternalChannelHandler(channelHandlerList, allocator, factory);
             channel.register(selector, ops, internalChannelHandler);
             channel.connect(new InetSocketAddress(client.getHost(), client.getPort()));
+            if(initSignal != null) initSignal.complete();
         } catch (OutOfMemoryError | IOError | IOException | SocketOptionException | RuntimeException exception) {
             logger.log(Level.WARNING, exception.getMessage(), exception);
             cleanUp();
             if(initSignal != null) initSignal.fail();
+            if(onConnectSignal != null) onConnectSignal.fail();
             return;
         }
 
@@ -78,9 +83,8 @@ public class ClientWorker extends AbstractWorker {
             }
         } finally {
             cleanUp();
-            if(initSignal != null) initSignal.complete();
+            logger.info("ClientWorker exiting. Current thread: " + Thread.currentThread().getName());
         }
-        logger.info(Thread.currentThread().getName() + " exiting.");
     }
 
     private void cleanUp() {
