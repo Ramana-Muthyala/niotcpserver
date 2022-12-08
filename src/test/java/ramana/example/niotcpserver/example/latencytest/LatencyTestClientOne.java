@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.logging.Logger;
 
-public class LatencyTestClient {
+public class LatencyTestClientOne {
     private static final Logger logger = LogFactory.getLogger();
 
     public static void main(String[] args) {
@@ -28,7 +28,7 @@ public class LatencyTestClient {
         private final SelectorProvider provider = SelectorProvider.provider();
         @Override
         public void run() {
-            int loop = 5000;
+            int loop = 1000;
             long start = System.nanoTime();
             for (int i = 0; i < loop; i++) {
                 new ClientWorker(this, null, null, provider).run();

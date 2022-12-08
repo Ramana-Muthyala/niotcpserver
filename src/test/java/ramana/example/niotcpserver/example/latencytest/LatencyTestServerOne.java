@@ -5,7 +5,7 @@ import ramana.example.niotcpserver.handler.Context;
 import ramana.example.niotcpserver.handler.impl.ChannelHandlerAdapter;
 import ramana.example.niotcpserver.types.InternalException;
 
-public class LatencyTestServer {
+public class LatencyTestServerOne {
 
     public static void main(String[] args) {
         new Bootstrap().listen(8007)
