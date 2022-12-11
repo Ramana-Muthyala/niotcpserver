@@ -52,13 +52,13 @@ public class Util {
         String clazz = source.substring(i1 + 1);
         String packageName = source.substring(0, i1);
         StringBuilder builder = new StringBuilder();
-        int i2 = -1;
+        int i2;
         while ((i2 = packageName.indexOf('.')) != -1) {
-            builder.append(packageName.charAt(0) + ".");
+            builder.append(packageName.charAt(0)).append(".");
             packageName = packageName.substring(i2 + 1);
         }
-        builder.append(packageName.charAt(0) + ".");
-        return builder.toString() + clazz;
+        builder.append(packageName.charAt(0)).append(".");
+        return builder + clazz;
     }
 
     public static String normalizeClassName(List<Class<? extends ChannelHandler>> channelHandlers) {

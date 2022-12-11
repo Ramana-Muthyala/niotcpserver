@@ -137,7 +137,7 @@ public class Worker extends AbstractWorker {
             LinkedList<ChannelHandler> channelHandlerList = Util.createLinkedList(channelHandlers);
             if(loggingEnabled) channelHandlerList.addFirst(LoggingHandler.defaultInstance);
             ContextFactory factory = loggingEnabled ? ContextFactory.loggingFactory() : ContextFactory.factory();
-            InternalChannelHandler internalChannelHandler = idleTimeout == 0 ? new InternalChannelHandler(channelHandlerList, allocator, factory) : new IdleTimeoutInternalChannelHandler(channelHandlerList, factory, this, idleTimeout, loggingEnabled);
+            InternalChannelHandler internalChannelHandler = idleTimeout == 0 ? new InternalChannelHandler(channelHandlerList, allocator, factory, defaultRead) : new IdleTimeoutInternalChannelHandler(channelHandlerList, factory, defaultRead, this, idleTimeout, loggingEnabled);
             SelectionKey sk = channel.register(selector, ops, internalChannelHandler);
             internalChannelHandler.onConnect(sk);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException | SocketOptionException exception) {

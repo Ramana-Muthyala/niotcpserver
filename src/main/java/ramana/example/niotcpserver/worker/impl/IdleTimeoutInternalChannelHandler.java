@@ -13,8 +13,8 @@ public class IdleTimeoutInternalChannelHandler extends InternalChannelHandler {
     private final boolean loggingEnabled;
     private long idleTimeoutTicker;
 
-    public IdleTimeoutInternalChannelHandler(LinkedList<ChannelHandler> channelHandlers, ContextFactory factory, Worker worker, int idleTimeout, boolean loggingEnabled) {
-        super(channelHandlers, worker.allocator, factory);
+    public IdleTimeoutInternalChannelHandler(LinkedList<ChannelHandler> channelHandlers, ContextFactory factory, boolean defaultRead, Worker worker, int idleTimeout, boolean loggingEnabled) {
+        super(channelHandlers, worker.allocator, factory, defaultRead);
         this.worker = worker;
         idleTimeoutInMilliSec = idleTimeout * 1000;
         this.loggingEnabled = loggingEnabled;

@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 
 public interface Context {
     interface OnConnect extends OnRead {
+        boolean isDefaultReadEnabled();
         void fireReadInterest() throws InternalException;
     }
 

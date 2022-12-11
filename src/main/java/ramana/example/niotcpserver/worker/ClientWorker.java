@@ -65,7 +65,7 @@ public class ClientWorker extends AbstractWorker {
             LinkedList<ChannelHandler> channelHandlerList = Util.createLinkedListFromInstanceList(client.getChannelHandlers());
             if(loggingEnabled) channelHandlerList.addFirst(LoggingHandler.defaultInstance);
             ContextFactory factory = loggingEnabled ? ContextFactory.loggingFactory() : ContextFactory.factory();
-            InternalChannelHandler internalChannelHandler = new InternalChannelHandler(channelHandlerList, allocator, factory);
+            InternalChannelHandler internalChannelHandler = new InternalChannelHandler(channelHandlerList, allocator, factory, client.isDefaultRead());
             channel.register(selector, ops, internalChannelHandler);
             channel.connect(new InetSocketAddress(client.getHost(), client.getPort()));
             if(initSignal != null) initSignal.complete();

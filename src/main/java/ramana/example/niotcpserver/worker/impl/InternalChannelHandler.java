@@ -21,6 +21,7 @@ public class InternalChannelHandler {
     protected static final Logger logger = LogFactory.getLogger();
     protected final LinkedList<ChannelHandler> channelHandlers;
     protected final Allocator<ByteBuffer> allocator;
+    protected final boolean defaultRead;
     protected ChannelOperations channelOperations;
     protected boolean closeInitiated;
     private final ContextFactory factory;
@@ -30,10 +31,11 @@ public class InternalChannelHandler {
         return socketAddress;
     }
 
-    public InternalChannelHandler(LinkedList<ChannelHandler> channelHandlers, Allocator<ByteBuffer> allocator, ContextFactory factory) {
+    public InternalChannelHandler(LinkedList<ChannelHandler> channelHandlers, Allocator<ByteBuffer> allocator, ContextFactory factory, boolean defaultRead) {
         this.channelHandlers = channelHandlers;
         this.allocator = allocator;
         this.factory = factory;
+        this.defaultRead = defaultRead;
     }
 
     public void handleWrite() {

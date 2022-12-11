@@ -16,10 +16,6 @@ public class DefaultContext implements Context.OnConnect, Context.OnClose {
     ChannelHandlerMethodName channelHandlerMethodName;
     Throwable cause;
 
-    public String getSocketAddress() {
-        return internalChannelHandler.getSocketAddress();
-    }
-
     DefaultContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, ChannelHandlerMethodName channelHandlerMethodName) {
         this.internalChannelHandler = internalChannelHandler;
         this.channelHandlerNode = channelHandlerNode;
@@ -34,6 +30,15 @@ public class DefaultContext implements Context.OnConnect, Context.OnClose {
 
     public DefaultContext(InternalChannelHandler internalChannelHandler) {
         this.internalChannelHandler = internalChannelHandler;
+    }
+
+    public String getSocketAddress() {
+        return internalChannelHandler.getSocketAddress();
+    }
+
+    @Override
+    public boolean isDefaultReadEnabled() {
+        return internalChannelHandler.defaultRead;
     }
 
     @Override
