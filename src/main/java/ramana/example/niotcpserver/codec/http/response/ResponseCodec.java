@@ -4,8 +4,8 @@ import ramana.example.niotcpserver.io.Allocator;
 
 import java.nio.ByteBuffer;
 
-public class HttpResponseCodec {
-    public static HttpResponseCodec getInstance() {
+public class ResponseCodec {
+    public static ResponseCodec getInstance() {
         return null;
     }
 
@@ -13,7 +13,7 @@ public class HttpResponseCodec {
         return null;
     }
 
-    public Allocator.Resource<ByteBuffer> encode(Allocator<ByteBuffer> allocator, HttpResponseMessage responseMessage) {
+    public Allocator.Resource<ByteBuffer> encode(Allocator<ByteBuffer> allocator, ResponseMessage responseMessage) {
         return null;
     }
 }

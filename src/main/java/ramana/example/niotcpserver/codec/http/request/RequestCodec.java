@@ -6,21 +6,31 @@ import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
+import java.util.Deque;
+import java.util.LinkedList;
 
-public class HttpRequestCodec {
-    private final AbstractParser<HttpRequestMessage> parser;
-    public HttpRequestCodec() {
-        AbstractParser firstParser = null;
-        parser = new HttpRequestParser(firstParser);
+/*
+ * HTTP/1.1 - ref: https://httpwg.org/specs/rfc9112.html
+ * RequestCodec refers to the above link but is implemented in a very lenient manner.
+ * Provisions are given to aid incremental evolution.
+ * Focus is on providing a parsing framework and a simple example.
+ */
+public class RequestCodec {
+    private final AbstractParser<RequestMessage> parser;
+    private final Deque<ByteBuffer> dataDeque = new LinkedList<>();
+
+    public RequestCodec() {
+        parser = new RequestParser(dataDeque);
     }
 
     public void decode(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
         ByteBuffer byteBuffer = data.get();
         byteBuffer.flip();
         parser.parse(byteBuffer);
+        while((byteBuffer = dataDeque.poll()) != null) parser.parse(byteBuffer);
     }
 
-    public HttpRequestMessage get() {
+    public RequestMessage get() {
         return parser.getResult();
     }
 

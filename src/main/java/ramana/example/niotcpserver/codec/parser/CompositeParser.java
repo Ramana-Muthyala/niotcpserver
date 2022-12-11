@@ -2,13 +2,15 @@ package ramana.example.niotcpserver.codec.parser;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Deque;
 
 public abstract class CompositeParser<T> extends AbstractParser<T> {
+    protected final Deque<ByteBuffer> dataDeque;
     protected ArrayList<AbstractParser> parsers = new ArrayList<>();
     protected int index;
 
-    public CompositeParser(AbstractParser parser) {
-        parsers.add(parser);
+    public CompositeParser(Deque<ByteBuffer> dataDeque) {
+        this.dataDeque = dataDeque;
     }
 
     public CompositeParser<T> add(AbstractParser parser) {

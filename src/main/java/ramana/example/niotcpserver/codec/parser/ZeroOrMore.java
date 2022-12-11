@@ -33,9 +33,6 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractPushback
             }
         }
         if(parser.status == Status.IN_PROGRESS) stack.offer(data);
-        if(status == Status.DONE) {
-            ByteBuffer tmp;
-            while((tmp = stack.pollLast()) != null) dataDeque.offerFirst(tmp);
-        }
+        if(status == Status.DONE) pushBack();
     }
 }

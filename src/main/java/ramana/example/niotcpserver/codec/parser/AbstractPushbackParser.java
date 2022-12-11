@@ -11,4 +11,12 @@ public abstract class AbstractPushbackParser<T> extends AbstractParser<T> {
     protected AbstractPushbackParser(Deque<ByteBuffer> dataDeque) {
         this.dataDeque = dataDeque;
     }
+
+    protected void pushBack() {
+        ByteBuffer tmp;
+        while((tmp = stack.pollLast()) != null) {
+            tmp.reset();
+            dataDeque.offerFirst(tmp);
+        }
+    }
 }
