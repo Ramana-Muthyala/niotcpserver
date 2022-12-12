@@ -27,7 +27,9 @@ public class RequestCodec {
         ByteBuffer byteBuffer = data.get();
         byteBuffer.flip();
         parser.parse(byteBuffer);
-        while((byteBuffer = dataDeque.poll()) != null) parser.parse(byteBuffer);
+        while((byteBuffer = dataDeque.poll()) != null  &&  byteBuffer.hasRemaining()) {
+            parser.parse(byteBuffer);
+        }
     }
 
     public RequestMessage get() {

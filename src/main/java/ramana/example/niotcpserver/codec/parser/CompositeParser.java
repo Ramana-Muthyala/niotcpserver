@@ -20,9 +20,11 @@ public abstract class CompositeParser<T> extends AbstractParser<T> {
 
     @Override
     public void parse(ByteBuffer data) throws ParseException {
+        if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
         while(data.hasRemaining()) {
             AbstractParser parser = parsers.get(index);
+            parser.parse(data);
             if(parser.status == Status.DONE) {
                 index++;
                 if(index == parsers.size()) {
@@ -30,9 +32,7 @@ public abstract class CompositeParser<T> extends AbstractParser<T> {
                     status = Status.DONE;
                     return;
                 }
-                parser = parsers.get(index);
             }
-            parser.parse(data);
         }
     }
 

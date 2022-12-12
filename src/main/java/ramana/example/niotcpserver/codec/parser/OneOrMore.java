@@ -27,9 +27,11 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
 
     @Override
     public void parse(ByteBuffer data) throws ParseException {
+        if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
         while(data.hasRemaining()) {
             AbstractParser parser = parsers[index];
+            parser.parse(data);
             if(parser.status == Status.DONE) {
                 composeResult(parser);
                 index++;
@@ -37,9 +39,7 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
                     status = Status.DONE;
                     return;
                 }
-                parser = parsers[index];
             }
-            parser.parse(data);
         }
     }
 }

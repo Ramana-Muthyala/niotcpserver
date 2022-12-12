@@ -16,6 +16,7 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractPushback
 
     @Override
     public void parse(ByteBuffer data) {
+        if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
         data.mark();
         while(data.hasRemaining()) {

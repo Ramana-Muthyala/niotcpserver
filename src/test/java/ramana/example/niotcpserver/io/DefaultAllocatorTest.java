@@ -13,7 +13,6 @@ import java.util.Queue;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DefaultAllocatorTest {
-
     @Test
     void testAllocation() throws NoSuchFieldException, IllegalAccessException {
         DefaultAllocator allocator = new DefaultAllocator();

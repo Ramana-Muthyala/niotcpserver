@@ -13,14 +13,14 @@ public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackPa
         this.parsers = parsers;
     }
 
-
     @Override
     public void parse(ByteBuffer data) throws ParseException {
+        if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
         data.mark();
         while(data.hasRemaining()) {
-            P parser = parsers.get(index);
             try {
+                P parser = parsers.get(index);
                 parser.parse(data);
                 if(parser.status == Status.DONE) {
                     stack.clear();
@@ -28,12 +28,13 @@ public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackPa
                     status = Status.DONE;
                     return;
                 }
+                if(stack.peekLast() != data) stack.offer(data);
             } catch (ParseException exception) {
                 index++;
+                if(stack.peekLast() != data) stack.offer(data);
                 pushBack();
                 if(index == parsers.size()) throw exception;
             }
-            if(parser.status == Status.IN_PROGRESS) stack.offer(data);
         }
     }
 }

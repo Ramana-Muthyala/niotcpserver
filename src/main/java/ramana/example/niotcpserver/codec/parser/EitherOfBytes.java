@@ -11,6 +11,7 @@ public class EitherOfBytes extends AbstractParser<Byte> {
 
     @Override
     public void parse(ByteBuffer data) throws ParseException {
+        if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
         if(!data.hasRemaining()) return;
         byte tmp = data.get();
@@ -21,6 +22,6 @@ public class EitherOfBytes extends AbstractParser<Byte> {
                 break;
             }
         }
-        if(result == null) throw new ParseException();
+        if(result == null) throw new ParseException("Expected byte not matched. Found: " + tmp);
     }
 }

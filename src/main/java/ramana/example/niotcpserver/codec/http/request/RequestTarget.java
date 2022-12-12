@@ -1,25 +1,36 @@
 package ramana.example.niotcpserver.codec.http.request;
 
-import java.util.regex.Pattern;
+import ramana.example.niotcpserver.codec.parser.ParseException;
 
 public class RequestTarget {
-    private static final Pattern originForm = Pattern.compile("/([a-zA-Z\\d/])+([?])?([a-zA-Z\\d%&=/#])*");
-    private static final Pattern absoluteForm = Pattern.compile("http(s)?://([a-zA-Z./])+([a-zA-Z\\d/])+([?])?([a-zA-Z\\d%&=/#])*");
-    private static final Pattern authorityForm = Pattern.compile("([a-zA-Z.])+:(\\d)+");
-
     public String path;
     public String queryString;
-    public RequestTarget(String input) {
-        if(originForm.matcher(input).matches()) {
-            setPathAndQueryString(input);
-        } else if(absoluteForm.matcher(input).matches()) {
+
+    /*
+    * Complete lenient parsing. Can be changed later on.
+    * Works faster for valid requests.
+    * */
+    public RequestTarget(String input) throws ParseException {
+        if(input.length() == 0) throw new ParseException();
+        if(input.charAt(0) == '/') {
+            // originForm
+            if(input.length() == 1) path = "";
+            else setPathAndQueryString(input);
+        } else if(input.startsWith("http")) {
+            // absoluteForm
             int index = input.indexOf("://");
-            setPathAndQueryString(input.substring(index + 3));
-        } else if (authorityForm.matcher(input).matches()) {
-            path = input.substring(0, input.indexOf(':'));
-        } else {
+            if((index == -1)  ||  ((index + 3)  ==  input.length())) throw new ParseException();
+            index = input.indexOf('/', index + 3);
+            if(index == -1) path = "";
+            else setPathAndQueryString(input.substring(index));
+        } else if(input.equals("*")) {
             // asteriskForm = "*";
             path = input;
+        } else {
+            // expected: authorityForm
+            int index = input.indexOf(':');
+            if(index == -1) throw new ParseException();
+            path = "";
         }
     }
 
@@ -27,7 +38,7 @@ public class RequestTarget {
         int index = input.indexOf('?');
         if(index != -1) {
             path = input.substring(1, index);
-            queryString = (index + 1 < input.length()) ? input.substring(index + 1) : null;
+            queryString = ((index + 1) < input.length()) ? input.substring(index + 1) : null;
         } else {
             path = input.substring(1);
         }

@@ -16,6 +16,7 @@ public abstract class AbstractPushbackParser<T> extends AbstractParser<T> {
         ByteBuffer tmp;
         while((tmp = stack.pollLast()) != null) {
             tmp.reset();
+            if(tmp == dataDeque.peekFirst()) continue;
             dataDeque.offerFirst(tmp);
         }
     }

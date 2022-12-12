@@ -12,9 +12,11 @@ public class ByteSequence extends AbstractParser<byte[]> {
 
     @Override
     public void parse(ByteBuffer data) throws ParseException {
+        if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
         while(data.hasRemaining()  &&  index < byteSequence.length) {
-            if(data.get() != byteSequence[index]) throw new ParseException();
+            byte tmp = data.get();
+            if(tmp != byteSequence[index]) throw new ParseException("Expected: " + byteSequence[index] + ", Found: " + tmp);
             index++;
         }
         if(index == byteSequence.length) {

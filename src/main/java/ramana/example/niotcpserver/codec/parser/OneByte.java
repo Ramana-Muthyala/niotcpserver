@@ -11,14 +11,15 @@ public class OneByte extends AbstractParser<Byte> {
 
     @Override
     public void parse(ByteBuffer data) throws ParseException {
+        if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
-        if(data.hasRemaining()) {
-            byte tmp = data.get();
-            if(tmp == expected) {
-                status = Status.DONE;
-                return;
-            }
-            throw new ParseException();
+        if(!data.hasRemaining()) return;
+        byte tmp = data.get();
+        if(tmp == expected) {
+            result = tmp;
+            status = Status.DONE;
+            return;
         }
+        throw new ParseException("Expected: " + expected + ", Found: " + tmp);
     }
 }
