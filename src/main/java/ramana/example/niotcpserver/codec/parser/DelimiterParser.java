@@ -30,13 +30,13 @@ public class DelimiterParser extends AbstractParser<String> {
             byte tmp = data.get();
             if(tmp == delimiter) {
                 data.position(data.position() - 1);
-                result = accumulator.get();
+                result = accumulator.getAsString();
                 status = Status.DONE;
                 return;
             }
             if(tmp == breakPoint) {
                 data.position(data.position() - 1);
-                result = accumulator.get();
+                result = accumulator.getAsString();
                 throw new DelimiterBreakPointParseException();
             }
             accumulator.put(tmp);

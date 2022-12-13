@@ -11,7 +11,8 @@ public class RequestMessage extends Message {
     public final Map<String, String> queryParameters;
     public final List<Header> headers;
 
-    public RequestMessage(RequestLine requestLine, List<Header> headers) {
+    public RequestMessage(RequestLine requestLine, List<Header> headers, byte[] body) {
+        super(body);
         this.method = requestLine.method;
         this.path = requestLine.path;
         this.queryParameters = requestLine.queryParameters;

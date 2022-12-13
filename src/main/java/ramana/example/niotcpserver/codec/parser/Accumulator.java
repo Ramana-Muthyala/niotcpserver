@@ -18,7 +18,11 @@ public class Accumulator {
         index++;
     }
 
-    public String get() {
+    public byte[] getInternalByteArray() {
+        return data;
+    }
+
+    public String getAsString() {
         return new String(data, 0, index);
     }
 }

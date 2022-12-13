@@ -1,6 +1,7 @@
 package ramana.example.niotcpserver.io;
 
 import org.junit.jupiter.api.Test;
+import ramana.example.niotcpserver.log.LogFactory;
 import ramana.example.niotcpserver.types.LinkedList;
 import ramana.example.niotcpserver.util.Constants;
 import ramana.example.niotcpserver.util.TestUtil;
@@ -9,10 +10,12 @@ import java.lang.ref.ReferenceQueue;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Queue;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DefaultAllocatorTest {
+    private static final Logger logger = LogFactory.getLogger();
     @Test
     void testAllocation() throws NoSuchFieldException, IllegalAccessException {
         DefaultAllocator allocator = new DefaultAllocator();
@@ -159,7 +162,7 @@ public class DefaultAllocatorTest {
             StringBuilder builder = new StringBuilder();
             while(true) builder.append("Memory drainer.......");
         } catch (OutOfMemoryError error) {
-            System.out.println(error.getClass().getName() + ": " + error.getMessage());
+            logger.info(error.getClass().getName() + ": " + error.getMessage());
         }
     }
 }

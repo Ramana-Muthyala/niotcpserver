@@ -14,12 +14,12 @@ public class Util {
     public static final byte COMMA = ',';
     public static final byte COLON = ':';
     public static final byte CR = '\r';
-    public static final byte LF = '\n';
     public static final byte[] CRLF = new byte[] {'\r', '\n'};
     public static final byte[] HTTP_SLASH = "HTTP/".getBytes();
     public static final int REQ_TARGET_MAX_LEN = 512;
     public static final int REQ_HEADER_MAX_LEN = 128;
     public static final int REQ_HEADER_VAL_MAX_LEN = 512;
+    public static final String REQ_HEADER_CONTENT_LENGTH = "Content-Length";
 
     public static OneByte createSpaceParser() {
         return new OneByte(SP);
