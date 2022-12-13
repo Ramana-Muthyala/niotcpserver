@@ -28,6 +28,11 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractPushback
                     parser.reset();
                     data.mark();
                 }
+            } catch (ParseCompleteSignalException exception) {
+                stack.clear();
+                result.add(parser.result);
+                status = Status.DONE;
+                break;
             } catch (ParseException exception) {
                 status = Status.DONE;
                 break;
@@ -35,5 +40,13 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractPushback
         }
         if(parser.status == Status.IN_PROGRESS) stack.offer(data);
         if(status == Status.DONE) pushBack();
+    }
+
+    @Override
+    protected void reset() {
+        parser.reset();
+        stack.clear();
+        result = new ArrayList<>();
+        status = Status.NONE;
     }
 }

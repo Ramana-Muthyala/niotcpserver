@@ -31,7 +31,13 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
         status = Status.IN_PROGRESS;
         while(data.hasRemaining()) {
             AbstractParser parser = parsers[index];
-            parser.parse(data);
+            try {
+                parser.parse(data);
+            } catch (ParseCompleteSignalException exception) {
+                composeResult(parser);
+                status = Status.DONE;
+                return;
+            }
             if(parser.status == Status.DONE) {
                 composeResult(parser);
                 index++;
@@ -41,5 +47,14 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
                 }
             }
         }
+    }
+
+    @Override
+    protected void reset() {
+        index = 0;
+        parsers[0].reset();
+        parsers[1].reset();
+        result = new ArrayList<>();
+        status = Status.NONE;
     }
 }

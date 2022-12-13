@@ -1,11 +1,13 @@
 package ramana.example.niotcpserver.codec.http.request;
 
+import java.util.ArrayList;
+
 public class Header {
     public final String name;
-    public final String value;
+    public final ArrayList<String> values;
 
-    public Header(String name, String value) {
+    public Header(String name, ArrayList<String> values) {
         this.name = name;
-        this.value = value;
+        this.values = values;
     }
 }

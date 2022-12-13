@@ -13,7 +13,7 @@ public class RequestLineParser extends CompositeParser<RequestLine> {
         parsers.add(Util.createSpaceParser());
         parsers.add(new RequestTargetParser());
         parsers.add(Util.createSpaceParser());
-        parsers.add(new ByteSequence("HTTP/".getBytes()));
+        parsers.add(new ByteSequence(Util.HTTP_SLASH));
         parsers.add(Util.createDigitParser());
         parsers.add(Util.createDotParser());
         parsers.add(Util.createDigitParser());
@@ -22,14 +22,14 @@ public class RequestLineParser extends CompositeParser<RequestLine> {
 
     private ArrayList<ByteSequence> createMethodParsers() {
         ArrayList<ByteSequence> methodParsers = new ArrayList<>();
-        methodParsers.add(new ByteSequence("GET".getBytes()));
-        methodParsers.add(new ByteSequence("HEAD".getBytes()));
-        methodParsers.add(new ByteSequence("POST".getBytes()));
-        methodParsers.add(new ByteSequence("PUT".getBytes()));
-        methodParsers.add(new ByteSequence("DELETE".getBytes()));
-        methodParsers.add(new ByteSequence("CONNECT".getBytes()));
-        methodParsers.add(new ByteSequence("OPTIONS".getBytes()));
-        methodParsers.add(new ByteSequence("TRACE".getBytes()));
+        methodParsers.add(new ByteSequence(Util.GET));
+        methodParsers.add(new ByteSequence(Util.HEAD));
+        methodParsers.add(new ByteSequence(Util.POST));
+        methodParsers.add(new ByteSequence(Util.PUT));
+        methodParsers.add(new ByteSequence(Util.DELETE));
+        methodParsers.add(new ByteSequence(Util.CONNECT));
+        methodParsers.add(new ByteSequence(Util.OPTIONS));
+        methodParsers.add(new ByteSequence(Util.TRACE));
         return methodParsers;
     }
 

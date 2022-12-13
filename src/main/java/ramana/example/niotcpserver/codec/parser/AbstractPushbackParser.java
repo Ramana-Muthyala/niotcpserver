@@ -20,4 +20,10 @@ public abstract class AbstractPushbackParser<T> extends AbstractParser<T> {
             dataDeque.offerFirst(tmp);
         }
     }
+
+    @Override
+    protected void reset() {
+        stack.clear();
+        super.reset();
+    }
 }

@@ -1,7 +1,7 @@
 package ramana.example.niotcpserver.codec.http.handler;
 
-import ramana.example.niotcpserver.codec.http.MessageHolder;
 import ramana.example.niotcpserver.codec.http.request.RequestCodec;
+import ramana.example.niotcpserver.codec.http.request.RequestMessage;
 import ramana.example.niotcpserver.codec.http.response.ResponseCodec;
 import ramana.example.niotcpserver.codec.http.response.ResponseMessage;
 import ramana.example.niotcpserver.codec.parser.ParseException;
@@ -29,16 +29,18 @@ public class ChannelHandler extends ChannelHandlerAdapter {
             requestCodec.decode((Allocator.Resource< ByteBuffer >)data);
         } catch (ParseException e) {
             context.write(responseCodec.badRequest(context.allocator()));
-            return;
+            context.close();
         }
-        if(requestCodec.isDecoded()) {
-            MessageHolder messageHolder = new MessageHolder(requestCodec.get());
-            context.next(messageHolder);
-        }
+        RequestMessage[] requestMessages = requestCodec.get();
+        if(requestMessages.length != 0) context.next(requestMessages);
     }
 
     @Override
     public void onWrite(Context.OnWrite context, Object data) throws InternalException {
-        context.next(responseCodec.encode(context.allocator(), (ResponseMessage) data));
+        ResponseMessage[] responseMessages = (ResponseMessage[]) data;
+        for (ResponseMessage responseMessage: responseMessages) {
+            context.write(responseCodec.encode(context.allocator(), responseMessage));
+        }
+        context.flush();
     }
 }

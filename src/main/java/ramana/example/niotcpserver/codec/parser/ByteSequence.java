@@ -24,4 +24,10 @@ public class ByteSequence extends AbstractParser<byte[]> {
             result = byteSequence;
         }
     }
+
+    @Override
+    protected void reset() {
+        index = 0;
+        super.reset();
+    }
 }

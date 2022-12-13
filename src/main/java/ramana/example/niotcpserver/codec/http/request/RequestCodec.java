@@ -8,6 +8,7 @@ import ramana.example.niotcpserver.types.InternalException;
 import java.nio.ByteBuffer;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Queue;
 
 /*
  * HTTP/1.1 - ref: https://httpwg.org/specs/rfc9112.html
@@ -16,27 +17,30 @@ import java.util.LinkedList;
  * Focus is on providing a parsing framework and a simple example.
  */
 public class RequestCodec {
-    private final AbstractParser<RequestMessage> parser;
+    private AbstractParser<RequestMessage> parser;
     private final Deque<ByteBuffer> dataDeque = new LinkedList<>();
+    private final Queue<RequestMessage> messageQueue = new LinkedList<>();
 
     public RequestCodec() {
         parser = new RequestParser(dataDeque);
     }
 
-    public void decode(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
+    public void decode(Allocator.Resource<ByteBuffer> data) throws InternalException, ParseException {
         ByteBuffer byteBuffer = data.get();
         byteBuffer.flip();
-        parser.parse(byteBuffer);
+        dataDeque.offer(byteBuffer);
         while((byteBuffer = dataDeque.poll()) != null  &&  byteBuffer.hasRemaining()) {
             parser.parse(byteBuffer);
+            if(parser.getStatus() == AbstractParser.Status.DONE) {
+                messageQueue.offer(parser.getResult());
+                parser = new RequestParser(dataDeque);
+            }
         }
     }
 
-    public RequestMessage get() {
-        return parser.getResult();
-    }
-
-    public boolean isDecoded() {
-        return parser.getStatus() == AbstractParser.Status.DONE;
+    public RequestMessage[] get() {
+        RequestMessage[] messageArray = messageQueue.toArray(new RequestMessage[0]);
+        messageQueue.clear();
+        return messageArray;
     }
 }
