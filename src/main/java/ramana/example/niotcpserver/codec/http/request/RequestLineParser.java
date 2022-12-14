@@ -1,15 +1,16 @@
 package ramana.example.niotcpserver.codec.http.request;
 
 import ramana.example.niotcpserver.codec.parser.*;
+import ramana.example.niotcpserver.io.Allocator;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Deque;
 
 public class RequestLineParser extends CompositeParser<RequestLine> {
-    public RequestLineParser(Deque<ByteBuffer> dataDeque) {
+    public RequestLineParser(Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
         super(dataDeque);
-        parsers.add(new EitherOf(createMethodParsers(), dataDeque));
+        parsers.add(new EitherOf<>(createMethodParsers(), dataDeque));
         parsers.add(Util.createSpaceParser());
         parsers.add(new RequestTargetParser());
         parsers.add(Util.createSpaceParser());

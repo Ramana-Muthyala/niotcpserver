@@ -1,17 +1,18 @@
 package ramana.example.niotcpserver.codec.http.request;
 
 import ramana.example.niotcpserver.codec.parser.*;
+import ramana.example.niotcpserver.io.Allocator;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Deque;
 
 public class HeaderParser extends CompositeParser<Header> {
-    public HeaderParser(Deque<ByteBuffer> dataDeque) {
+    public HeaderParser(Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
         super(dataDeque);
         parsers.add(new DelimiterParser(Util.COLON, Util.CR, Util.REQ_HEADER_MAX_LEN, Util.REQ_HEADER_MAX_LEN));
         parsers.add(new OneByte(Util.COLON));
-        parsers.add(new OneOrMore(new HeaderValueParser(), dataDeque));
+        parsers.add(new OneOrMore<>(new HeaderValueParser(), dataDeque));
         parsers.add(Util.createCRLFParser());
     }
 
@@ -25,7 +26,7 @@ public class HeaderParser extends CompositeParser<Header> {
         parsers.clear();
         parsers.add(new DelimiterParser(Util.COLON, Util.CR, Util.REQ_HEADER_MAX_LEN, Util.REQ_HEADER_MAX_LEN));
         parsers.add(new OneByte(Util.COLON));
-        parsers.add(new OneOrMore(new HeaderValueParser(), dataDeque));
+        parsers.add(new OneOrMore<>(new HeaderValueParser(), dataDeque));
         parsers.add(Util.createCRLFParser());
         super.reset();
     }

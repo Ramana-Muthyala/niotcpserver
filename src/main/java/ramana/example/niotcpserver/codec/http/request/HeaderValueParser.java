@@ -1,6 +1,8 @@
 package ramana.example.niotcpserver.codec.http.request;
 
 import ramana.example.niotcpserver.codec.parser.*;
+import ramana.example.niotcpserver.io.Allocator;
+import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 
@@ -12,9 +14,10 @@ public class HeaderValueParser extends AbstractParser<String> {
     }
 
     @Override
-    public void parse(ByteBuffer data) throws ParseException {
+    public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
         if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
+        ByteBuffer byteBuffer = data.get();
         try {
             parser.parse(data);
         } catch (DelimiterBreakPointParseException exception) {
@@ -23,7 +26,7 @@ public class HeaderValueParser extends AbstractParser<String> {
             throw new ParseCompleteSignalException(exception);
         }
         if(parser.getStatus() == Status.DONE) {
-            data.position(data.position() + 1);
+            byteBuffer.position(byteBuffer.position() + 1);
             status = Status.DONE;
             result = parser.getResult();
         }

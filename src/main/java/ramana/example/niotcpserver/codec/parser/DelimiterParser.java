@@ -1,5 +1,8 @@
 package ramana.example.niotcpserver.codec.parser;
 
+import ramana.example.niotcpserver.io.Allocator;
+import ramana.example.niotcpserver.types.InternalException;
+
 import java.nio.ByteBuffer;
 
 public class DelimiterParser extends AbstractParser<String> {
@@ -22,20 +25,21 @@ public class DelimiterParser extends AbstractParser<String> {
         this.accumulator = new Accumulator(accumulatorCapacity);
     }
     @Override
-    public void parse(ByteBuffer data) throws ParseException {
+    public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
         if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
-        while(data.hasRemaining()) {
+        ByteBuffer byteBuffer = data.get();
+        while(byteBuffer.hasRemaining()) {
             if(index == maxParseLength) throw new ParseException();
-            byte tmp = data.get();
+            byte tmp = byteBuffer.get();
             if(tmp == delimiter) {
-                data.position(data.position() - 1);
+                byteBuffer.position(byteBuffer.position() - 1);
                 result = accumulator.getAsString();
                 status = Status.DONE;
                 return;
             }
             if(tmp == breakPoint) {
-                data.position(data.position() - 1);
+                byteBuffer.position(byteBuffer.position() - 1);
                 result = accumulator.getAsString();
                 throw new DelimiterBreakPointParseException();
             }

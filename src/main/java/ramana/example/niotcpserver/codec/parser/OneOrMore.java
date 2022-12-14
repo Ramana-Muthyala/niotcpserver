@@ -1,5 +1,8 @@
 package ramana.example.niotcpserver.codec.parser;
 
+import ramana.example.niotcpserver.io.Allocator;
+import ramana.example.niotcpserver.types.InternalException;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +13,7 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
     private final AbstractParser[] parsers = new AbstractParser[2];
     private int index;
 
-    public OneOrMore(P parser, Deque<ByteBuffer> dataDeque) {
+    public OneOrMore(P parser, Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
         parsers[0] = parser;
         parsers[1] = new ZeroOrMore<>(parser, dataDeque);
         result = new ArrayList<>();
@@ -26,10 +29,11 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
     }
 
     @Override
-    public void parse(ByteBuffer data) throws ParseException {
+    public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
         if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
-        while(data.hasRemaining()) {
+        ByteBuffer byteBuffer = data.get();
+        while(byteBuffer.hasRemaining()) {
             AbstractParser parser = parsers[index];
             try {
                 parser.parse(data);

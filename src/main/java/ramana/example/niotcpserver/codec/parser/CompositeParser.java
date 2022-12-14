@@ -1,15 +1,18 @@
 package ramana.example.niotcpserver.codec.parser;
 
+import ramana.example.niotcpserver.io.Allocator;
+import ramana.example.niotcpserver.types.InternalException;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Deque;
 
 public abstract class CompositeParser<T> extends AbstractParser<T> {
-    protected final Deque<ByteBuffer> dataDeque;
+    protected final Deque<Allocator.Resource<ByteBuffer>> dataDeque;
     protected ArrayList<AbstractParser> parsers = new ArrayList<>();
     protected int index;
 
-    public CompositeParser(Deque<ByteBuffer> dataDeque) {
+    public CompositeParser(Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
         this.dataDeque = dataDeque;
     }
 
@@ -19,10 +22,11 @@ public abstract class CompositeParser<T> extends AbstractParser<T> {
     }
 
     @Override
-    public void parse(ByteBuffer data) throws ParseException {
+    public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
         if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
-        while(data.hasRemaining()) {
+        ByteBuffer byteBuffer = data.get();
+        while(byteBuffer.hasRemaining()) {
             AbstractParser parser = parsers.get(index);
             parser.parse(data);
             if(parser.status == Status.DONE) {

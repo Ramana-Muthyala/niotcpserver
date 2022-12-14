@@ -6,7 +6,6 @@ import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -19,7 +18,7 @@ import java.util.Queue;
  */
 public class RequestCodec {
     private AbstractParser<RequestMessage> parser;
-    private final Deque<ByteBuffer> dataDeque = new LinkedList<>();
+    private final Deque<Allocator.Resource<ByteBuffer>> dataDeque = new LinkedList<>();
     private final Queue<RequestMessage> messageQueue = new LinkedList<>();
 
     public RequestCodec() {
@@ -29,14 +28,21 @@ public class RequestCodec {
     public void decode(Allocator.Resource<ByteBuffer> data) throws InternalException, ParseException {
         ByteBuffer byteBuffer = data.get();
         byteBuffer.flip();
-        dataDeque.offer(byteBuffer);
-        while((byteBuffer = dataDeque.poll()) != null  &&  byteBuffer.hasRemaining()) {
-            parser.parse(byteBuffer);
+        dataDeque.offer(data);
+        while((data = dataDeque.poll()) != null) {
+            byteBuffer = data.get();
+            if(!byteBuffer.hasRemaining()) {
+                data.release();
+                continue;
+            }
+            parser.parse(data);
             if(parser.getStatus() == AbstractParser.Status.DONE) {
                 messageQueue.offer(parser.getResult());
                 parser = new RequestParser(dataDeque);
             }
+            if(byteBuffer.hasRemaining()) dataDeque.offerFirst(data);
         }
+        if(data != null) data.release();
     }
 
     public RequestMessage[] get() {

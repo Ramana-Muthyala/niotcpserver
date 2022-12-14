@@ -1,5 +1,8 @@
 package ramana.example.niotcpserver.codec.parser;
 
+import ramana.example.niotcpserver.io.Allocator;
+import ramana.example.niotcpserver.types.InternalException;
+
 import java.nio.ByteBuffer;
 
 public class ByteSequence extends AbstractParser<byte[]> {
@@ -11,11 +14,12 @@ public class ByteSequence extends AbstractParser<byte[]> {
     }
 
     @Override
-    public void parse(ByteBuffer data) throws ParseException {
+    public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
         if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
-        while(data.hasRemaining()  &&  index < byteSequence.length) {
-            byte tmp = data.get();
+        ByteBuffer byteBuffer = data.get();
+        while(byteBuffer.hasRemaining()  &&  index < byteSequence.length) {
+            byte tmp = byteBuffer.get();
             if(tmp != byteSequence[index]) throw new ParseException("Expected: " + byteSequence[index] + ", Found: " + tmp);
             index++;
         }

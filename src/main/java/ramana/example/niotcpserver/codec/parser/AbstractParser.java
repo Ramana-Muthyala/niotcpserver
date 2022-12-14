@@ -1,12 +1,15 @@
 package ramana.example.niotcpserver.codec.parser;
 
+import ramana.example.niotcpserver.io.Allocator;
+import ramana.example.niotcpserver.types.InternalException;
+
 import java.nio.ByteBuffer;
 
 public abstract class AbstractParser<T> {
     protected Status status = Status.NONE;
     protected T result;
 
-    public abstract void parse(ByteBuffer data) throws ParseException;
+    public abstract void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException;
 
     public Status getStatus() {
         return status;

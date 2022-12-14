@@ -1,5 +1,8 @@
 package ramana.example.niotcpserver.codec.parser;
 
+import ramana.example.niotcpserver.io.Allocator;
+import ramana.example.niotcpserver.types.InternalException;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -8,17 +11,18 @@ public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackPa
     private final ArrayList<P> parsers;
     int index;
 
-    public EitherOf(ArrayList<P> parsers, Deque<ByteBuffer> dataDeque) {
+    public EitherOf(ArrayList<P> parsers, Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
         super(dataDeque);
         this.parsers = parsers;
     }
 
     @Override
-    public void parse(ByteBuffer data) throws ParseException {
+    public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
         if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
-        data.mark();
-        while(data.hasRemaining()) {
+        ByteBuffer byteBuffer = data.get();
+        byteBuffer.mark();
+        while(byteBuffer.hasRemaining()) {
             try {
                 P parser = parsers.get(index);
                 parser.parse(data);
