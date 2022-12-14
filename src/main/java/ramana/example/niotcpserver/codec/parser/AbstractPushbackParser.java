@@ -26,7 +26,7 @@ public abstract class AbstractPushbackParser<T> extends AbstractParser<T> {
     }
 
     @Override
-    protected void reset() {
+    public void reset() {
         stack.clear();
         super.reset();
     }

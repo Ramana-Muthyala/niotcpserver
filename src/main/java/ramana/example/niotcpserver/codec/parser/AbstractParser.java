@@ -19,7 +19,7 @@ public abstract class AbstractParser<T> {
         return result;
     }
 
-    protected void reset() {
+    public void reset() {
         result = null;
         status = Status.NONE;
     }

@@ -1,16 +1,17 @@
 package ramana.example.niotcpserver.codec.http.request;
 
+import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.parser.*;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 
-public class HeaderValueParser extends AbstractParser<String> {
-    private final DelimiterParser parser;
+public class FieldValueParser extends AbstractParser<String> {
+    private final DelimiterStringParser parser;
 
-    public HeaderValueParser() {
-        parser = new DelimiterParser(Util.COMMA, Util.CR, Util.REQ_HEADER_VAL_MAX_LEN, Util.REQ_HEADER_VAL_MAX_LEN);
+    public FieldValueParser() {
+        parser = new DelimiterStringParser(Util.COMMA, Util.CR, Util.REQ_FIELD_VAL_MAX_LEN, Util.REQ_FIELD_VAL_MAX_LEN);
     }
 
     @Override
@@ -22,18 +23,18 @@ public class HeaderValueParser extends AbstractParser<String> {
             parser.parse(data);
         } catch (DelimiterBreakPointParseException exception) {
             status = Status.DONE;
-            result = parser.getResult();
+            result = parser.getResult().trim();
             throw new ParseCompleteSignalException(exception);
         }
         if(parser.getStatus() == Status.DONE) {
             byteBuffer.position(byteBuffer.position() + 1);
             status = Status.DONE;
-            result = parser.getResult();
+            result = parser.getResult().trim();
         }
     }
 
     @Override
-    protected void reset() {
+    public void reset() {
         parser.reset();
         super.reset();
     }

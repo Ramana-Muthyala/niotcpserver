@@ -5,9 +5,9 @@ import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 
-public class DelimiterParser extends AbstractParser<String> {
+public abstract class DelimiterParser<T> extends AbstractParser<T> {
     private final byte delimiter;
-    private Accumulator accumulator;
+    protected Accumulator accumulator;
     private final int maxParseLength;
     private final int accumulatorCapacity;
     private final byte breakPoint;
@@ -34,19 +34,21 @@ public class DelimiterParser extends AbstractParser<String> {
             byte tmp = byteBuffer.get();
             if(tmp == delimiter) {
                 byteBuffer.position(byteBuffer.position() - 1);
-                result = accumulator.getAsString();
+                composeResult();
                 status = Status.DONE;
                 return;
             }
             if(tmp == breakPoint) {
                 byteBuffer.position(byteBuffer.position() - 1);
-                result = accumulator.getAsString();
+                composeResult();
                 throw new DelimiterBreakPointParseException();
             }
             accumulator.put(tmp);
             index++;
         }
     }
+
+    protected abstract void composeResult();
 
     @Override
     public void reset() {

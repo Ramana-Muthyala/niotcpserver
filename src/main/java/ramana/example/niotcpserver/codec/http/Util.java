@@ -1,4 +1,8 @@
-package ramana.example.niotcpserver.codec.parser;
+package ramana.example.niotcpserver.codec.http;
+
+import ramana.example.niotcpserver.codec.parser.ByteSequence;
+import ramana.example.niotcpserver.codec.parser.EitherOfBytes;
+import ramana.example.niotcpserver.codec.parser.OneByte;
 
 public class Util {
     public static final byte[] GET = "GET".getBytes();
@@ -17,9 +21,14 @@ public class Util {
     public static final byte[] CRLF = new byte[] {'\r', '\n'};
     public static final byte[] HTTP_SLASH = "HTTP/".getBytes();
     public static final int REQ_TARGET_MAX_LEN = 512;
-    public static final int REQ_HEADER_MAX_LEN = 128;
-    public static final int REQ_HEADER_VAL_MAX_LEN = 512;
+    public static final int REQ_FIELD_MAX_LEN = 128;
+    public static final int REQ_FIELD_VAL_MAX_LEN = 512;
+    public static final int REQ_CHUNK_LEN_MAX_LEN = 32;
+    public static final int REQ_CHUNK_EXT_MAX_LEN = 512;
     public static final String REQ_HEADER_CONTENT_LENGTH = "Content-Length";
+    public static final String REQ_HEADER_TRANSFER_ENCODING = "Transfer-Encoding";
+    public static final String REQ_HEADER_TRANSFER_ENCODING_CHUNKED = "chunked";
+
 
     public static OneByte createSpaceParser() {
         return new OneByte(SP);

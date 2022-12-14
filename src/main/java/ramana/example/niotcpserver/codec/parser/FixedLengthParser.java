@@ -1,4 +1,4 @@
-package ramana.example.niotcpserver.codec.http.request;
+package ramana.example.niotcpserver.codec.parser;
 
 import ramana.example.niotcpserver.codec.parser.*;
 import ramana.example.niotcpserver.io.Allocator;
@@ -6,14 +6,14 @@ import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 
-public class ContentLengthBasedBodyParser extends AbstractParser<byte[]> {
-    private final Accumulator accumulator;
+public class FixedLengthParser extends AbstractParser<byte[]> {
+    private Accumulator accumulator;
     private int index;
-    private final int contentLength;
+    private final int length;
 
-    public ContentLengthBasedBodyParser(int contentLength) {
-        this.contentLength = contentLength;
-        accumulator = new Accumulator(contentLength);
+    public FixedLengthParser(int length) {
+        this.length = length;
+        accumulator = new Accumulator(length);
     }
 
     @Override
@@ -25,11 +25,18 @@ public class ContentLengthBasedBodyParser extends AbstractParser<byte[]> {
             byte tmp = byteBuffer.get();
             accumulator.put(tmp);
             index++;
-            if(index == contentLength) {
+            if(index == length) {
                 status = Status.DONE;
                 result = accumulator.getInternalByteArray();
                 return;
             }
         }
+    }
+
+    @Override
+    public void reset() {
+        index = 0;
+        accumulator = new Accumulator(length);
+        super.reset();
     }
 }

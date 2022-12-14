@@ -47,7 +47,7 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractPushback
     }
 
     @Override
-    protected void reset() {
+    public void reset() {
         parser.reset();
         stack.clear();
         result = new ArrayList<>();

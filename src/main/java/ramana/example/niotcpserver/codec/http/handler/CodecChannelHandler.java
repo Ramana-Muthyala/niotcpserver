@@ -12,7 +12,7 @@ import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 
-public class ChannelHandler extends ChannelHandlerAdapter {
+public class CodecChannelHandler extends ChannelHandlerAdapter {
     private RequestCodec requestCodec;
     private ResponseCodec responseCodec;
 
@@ -37,10 +37,7 @@ public class ChannelHandler extends ChannelHandlerAdapter {
 
     @Override
     public void onWrite(Context.OnWrite context, Object data) throws InternalException {
-        ResponseMessage[] responseMessages = (ResponseMessage[]) data;
-        for (ResponseMessage responseMessage: responseMessages) {
-            context.write(responseCodec.encode(context.allocator(), responseMessage));
-        }
+        context.write(responseCodec.encode(context.allocator(), (ResponseMessage) data));
         context.flush();
     }
 }

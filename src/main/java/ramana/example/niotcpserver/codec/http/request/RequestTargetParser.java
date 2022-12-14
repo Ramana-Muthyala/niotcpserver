@@ -1,16 +1,16 @@
 package ramana.example.niotcpserver.codec.http.request;
 
+import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.parser.AbstractParser;
-import ramana.example.niotcpserver.codec.parser.DelimiterParser;
+import ramana.example.niotcpserver.codec.parser.DelimiterStringParser;
 import ramana.example.niotcpserver.codec.parser.ParseException;
-import ramana.example.niotcpserver.codec.parser.Util;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 
 public class RequestTargetParser extends AbstractParser<RequestTarget> {
-    private final DelimiterParser parser;
+    private final DelimiterStringParser parser;
 
     public RequestTargetParser() {
         /*
@@ -19,7 +19,7 @@ public class RequestTargetParser extends AbstractParser<RequestTarget> {
         * As it is just an example, I am using DelimiterParser.
         * Can be changed anytime.
         * */
-        parser = new DelimiterParser(Util.SP, Util.CR, Util.REQ_TARGET_MAX_LEN, Util.REQ_TARGET_MAX_LEN);
+        parser = new DelimiterStringParser(Util.SP, Util.CR, Util.REQ_TARGET_MAX_LEN, Util.REQ_TARGET_MAX_LEN);
     }
 
     @Override

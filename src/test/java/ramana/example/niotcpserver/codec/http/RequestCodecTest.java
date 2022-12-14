@@ -149,12 +149,15 @@ public class RequestCodecTest {
         DefaultAllocator allocator = new DefaultAllocator();
         RequestCodec requestCodec = new RequestCodec();
         testSimpleRequest(allocator, requestCodec);
+        ParseException exception = null;
         try {
             testInvalidRequest(allocator, requestCodec);
-        } catch (ParseException exception) {
+        } catch (ParseException e) {
+            exception = e;
             logger.info(exception.getMessage());
             requestCodec = new RequestCodec();
         }
+        assertNotNull(exception);
         testHeadersRequest(allocator, requestCodec);
     }
 

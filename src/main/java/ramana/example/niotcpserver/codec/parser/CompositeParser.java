@@ -43,7 +43,7 @@ public abstract class CompositeParser<T> extends AbstractParser<T> {
     protected abstract T composeResult();
 
     @Override
-    protected void reset() {
+    public void reset() {
         index = 0;
         parsers.forEach(AbstractParser::reset);
         super.reset();

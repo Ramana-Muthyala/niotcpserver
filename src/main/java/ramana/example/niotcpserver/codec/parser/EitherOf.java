@@ -43,7 +43,7 @@ public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackPa
     }
 
     @Override
-    protected void reset() {
+    public void reset() {
         index = 0;
         parsers.forEach(AbstractParser::reset);
         super.reset();

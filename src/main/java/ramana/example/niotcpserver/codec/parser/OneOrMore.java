@@ -54,7 +54,7 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
     }
 
     @Override
-    protected void reset() {
+    public void reset() {
         index = 0;
         parsers[0].reset();
         parsers[1].reset();

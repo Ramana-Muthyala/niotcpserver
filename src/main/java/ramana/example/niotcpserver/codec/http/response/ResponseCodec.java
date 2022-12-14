@@ -16,4 +16,12 @@ public class ResponseCodec {
     public Allocator.Resource<ByteBuffer> encode(Allocator<ByteBuffer> allocator, ResponseMessage responseMessage) {
         return null;
     }
+
+    public ResponseMessage badRequest(ResponseMessage responseMessage) {
+        return responseMessage;
+    }
+
+    public ResponseMessage notImplemented(ResponseMessage responseMessage) {
+        return responseMessage;
+    }
 }

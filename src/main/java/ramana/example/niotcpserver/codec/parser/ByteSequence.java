@@ -30,7 +30,7 @@ public class ByteSequence extends AbstractParser<byte[]> {
     }
 
     @Override
-    protected void reset() {
+    public void reset() {
         index = 0;
         super.reset();
     }

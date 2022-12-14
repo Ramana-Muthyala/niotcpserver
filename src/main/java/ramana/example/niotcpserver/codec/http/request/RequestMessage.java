@@ -9,9 +9,9 @@ public class RequestMessage extends Message {
     public final String method;
     public final String path;
     public final Map<String, String> queryParameters;
-    public final List<Header> headers;
+    public final List<Field> headers;
 
-    public RequestMessage(RequestLine requestLine, List<Header> headers, byte[] body) {
+    public RequestMessage(RequestLine requestLine, List<Field> headers, byte[] body) {
         super(body);
         this.method = requestLine.method;
         this.path = requestLine.path;
