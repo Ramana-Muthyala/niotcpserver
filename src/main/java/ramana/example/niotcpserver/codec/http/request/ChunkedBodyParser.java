@@ -4,22 +4,18 @@ import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.parser.CompositeParser;
 import ramana.example.niotcpserver.codec.parser.OneOrMore;
 import ramana.example.niotcpserver.codec.parser.ZeroOrMore;
-import ramana.example.niotcpserver.io.Allocator;
 
-import java.nio.ByteBuffer;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 
 public class ChunkedBodyParser extends CompositeParser<byte[]> {
     private final List<Field> headers;
 
-    public ChunkedBodyParser(Deque<Allocator.Resource<ByteBuffer>> dataDeque, List<Field> headers) {
-        super(dataDeque);
+    public ChunkedBodyParser(List<Field> headers) {
         this.headers = headers;
-        parsers.add(new OneOrMore<>(new ChunkParser(), dataDeque));
-        parsers.add(new LastChunkParser(dataDeque));
-        parsers.add(new ZeroOrMore<>(new FieldLineParser(dataDeque), dataDeque));
+        parsers.add(new OneOrMore<>(new ChunkParser()));
+        parsers.add(new LastChunkParser());
+        parsers.add(new ZeroOrMore<>(new FieldLineParser()));
         parsers.add(Util.createCRLFParser());
     }
 

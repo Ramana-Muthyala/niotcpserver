@@ -1,6 +1,5 @@
 package ramana.example.niotcpserver.codec.parser;
 
-import ramana.example.niotcpserver.codec.parser.*;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.types.InternalException;
 

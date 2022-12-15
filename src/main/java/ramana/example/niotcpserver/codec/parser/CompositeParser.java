@@ -5,16 +5,10 @@ import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Deque;
 
 public abstract class CompositeParser<T> extends AbstractParser<T> {
-    protected final Deque<Allocator.Resource<ByteBuffer>> dataDeque;
     protected ArrayList<AbstractParser> parsers = new ArrayList<>();
     protected int index;
-
-    public CompositeParser(Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
-        this.dataDeque = dataDeque;
-    }
 
     public CompositeParser<T> add(AbstractParser parser) {
         parsers.add(parser);

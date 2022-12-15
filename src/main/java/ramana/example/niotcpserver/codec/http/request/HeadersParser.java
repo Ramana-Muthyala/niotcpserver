@@ -1,23 +1,22 @@
 package ramana.example.niotcpserver.codec.http.request;
 
+import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.parser.AbstractParser;
 import ramana.example.niotcpserver.codec.parser.FixedLengthParser;
 import ramana.example.niotcpserver.codec.parser.ParseException;
-import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.parser.ZeroOrMore;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 public class HeadersParser extends ZeroOrMore<Field, FieldLineParser> {
     private final RequestParser requestParser;
 
-    public HeadersParser(FieldLineParser parser, Deque<Allocator.Resource<ByteBuffer>> dataDeque, RequestParser requestParser) {
-        super(parser, dataDeque);
+    public HeadersParser(FieldLineParser parser, RequestParser requestParser) {
+        super(parser);
         this.requestParser = requestParser;
     }
 
@@ -46,7 +45,7 @@ public class HeadersParser extends ZeroOrMore<Field, FieldLineParser> {
             if(contentLength != null  &&  transferEncoding != null) throw new ParseException();
         }
         if(transferEncoding != null  &&  transferEncoding.contains(Util.REQ_HEADER_TRANSFER_ENCODING_CHUNKED)) {
-            return new ChunkedBodyParser(dataDeque, result);
+            return new ChunkedBodyParser(result);
         }
         if(contentLength != null) {
             if(contentLength < 0) throw new ParseException();

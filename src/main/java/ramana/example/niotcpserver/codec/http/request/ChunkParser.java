@@ -9,14 +9,14 @@ import java.nio.ByteBuffer;
 
 public class ChunkParser extends AbstractParser<byte[]> {
     private final ByteSequence crlfParser;
-    private final DelimiterStringParser chunkLenParser;
+    private final MultipleDelimiterStringParser chunkLenParser;
     private final DelimiterStringParser chunkExtParser;
     private State state = State.CHUNK_LEN;
     private int chunkLen;
     private FixedLengthParser chunkDataParser;
 
     public ChunkParser() {
-        chunkLenParser = new DelimiterStringParser(Util.SP, Util.CR, Util.REQ_CHUNK_LEN_MAX_LEN, Util.REQ_CHUNK_LEN_MAX_LEN);
+        chunkLenParser = new MultipleDelimiterStringParser(new byte[]{ Util.SEMI_COLON, Util.SP }, Util.CR, Util.REQ_CHUNK_LEN_MAX_LEN, Util.REQ_CHUNK_LEN_MAX_LEN);
         chunkExtParser = new DelimiterStringParser(Util.CR, Util.CR, Util.REQ_CHUNK_EXT_MAX_LEN, Util.REQ_CHUNK_EXT_MAX_LEN);
         crlfParser = Util.createCRLFParser();
     }
@@ -25,7 +25,6 @@ public class ChunkParser extends AbstractParser<byte[]> {
     public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
         if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
-
         ByteBuffer byteBuffer = data.get();
         while(byteBuffer.hasRemaining()) {
             switch (state) {
@@ -85,14 +84,10 @@ public class ChunkParser extends AbstractParser<byte[]> {
             } catch (NumberFormatException exception) {
                 throw new ParseException(exception);
             }
-            if(chunkLen < 0) throw new ParseException();
-            if(chunkLen == 0) {
-                ByteBuffer byteBuffer = data.get();
-                byteBuffer.position(byteBuffer.position() - 1);
+            if(chunkLen <= 0) {
                 throw new ParseException();
-            } else {
-                state = State.CHUNK_EXT;
             }
+            state = State.CHUNK_EXT;
         }
     }
 

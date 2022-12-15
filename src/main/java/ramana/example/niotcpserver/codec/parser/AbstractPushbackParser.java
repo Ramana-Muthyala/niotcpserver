@@ -8,26 +8,39 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 public abstract class AbstractPushbackParser<T> extends AbstractParser<T> {
-    protected Deque<Allocator.Resource<ByteBuffer>> stack = new LinkedList<>();
-    protected final Deque<Allocator.Resource<ByteBuffer>> dataDeque;
-
-    protected AbstractPushbackParser(Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
-        this.dataDeque = dataDeque;
-    }
+    protected Deque<MarkWrapper> stack = new LinkedList<>();
+    protected final Deque<Allocator.Resource<ByteBuffer>> dataDeque = new LinkedList<>();
 
     protected void pushBack() throws InternalException {
-        Allocator.Resource<ByteBuffer> tmp;
-        while((tmp = stack.pollLast()) != null) {
-            ByteBuffer byteBuffer = tmp.get();
-            byteBuffer.reset();
-            if(tmp == dataDeque.peekFirst()) continue;
-            dataDeque.offerFirst(tmp);
+        MarkWrapper wrapper;
+        while((wrapper = stack.pollLast()) != null) {
+            wrapper.reset();
+            dataDeque.offerFirst(wrapper.resource);
         }
     }
 
     @Override
     public void reset() {
         stack.clear();
+        dataDeque.clear();
         super.reset();
+    }
+
+    protected static class MarkWrapper {
+        private int position;
+        private final Allocator.Resource<ByteBuffer> resource;
+
+        public MarkWrapper(Allocator.Resource<ByteBuffer> resource, int position) {
+            this.resource = resource;
+            this.position = position;
+        }
+
+        private void reset() throws InternalException {
+            resource.get().position(position);
+        }
+
+        public void mark(int position) {
+            this.position = position;
+        }
     }
 }

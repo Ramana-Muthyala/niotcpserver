@@ -4,14 +4,9 @@ import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.parser.CompositeParser;
 import ramana.example.niotcpserver.codec.parser.DelimiterStringParser;
 import ramana.example.niotcpserver.codec.parser.OneByte;
-import ramana.example.niotcpserver.io.Allocator;
-
-import java.nio.ByteBuffer;
-import java.util.Deque;
 
 public class LastChunkParser extends CompositeParser<Void> {
-    public LastChunkParser(Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
-        super(dataDeque);
+    public LastChunkParser() {
         parsers.add(new OneByte((byte) '0'));
         parsers.add(new DelimiterStringParser(Util.CR, Util.CR, Util.REQ_CHUNK_EXT_MAX_LEN, Util.REQ_CHUNK_EXT_MAX_LEN));
         parsers.add(Util.createCRLFParser());

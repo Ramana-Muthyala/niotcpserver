@@ -6,16 +6,15 @@ import ramana.example.niotcpserver.types.InternalException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 
 public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<List<T>> {
     private final AbstractParser[] parsers = new AbstractParser[2];
     private int index;
 
-    public OneOrMore(P parser, Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
+    public OneOrMore(P parser) {
         parsers[0] = parser;
-        parsers[1] = new ZeroOrMore<>(parser, dataDeque);
+        parsers[1] = new ZeroOrMore<>(parser);
         result = new ArrayList<>();
     }
 

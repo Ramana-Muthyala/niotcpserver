@@ -17,6 +17,7 @@ public class Util {
     public static final byte DOT = '.';
     public static final byte COMMA = ',';
     public static final byte COLON = ':';
+    public static final byte SEMI_COLON = ';';
     public static final byte CR = '\r';
     public static final byte[] CRLF = new byte[] {'\r', '\n'};
     public static final byte[] HTTP_SLASH = "HTTP/".getBytes();

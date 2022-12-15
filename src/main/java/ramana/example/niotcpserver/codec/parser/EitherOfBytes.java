@@ -23,7 +23,7 @@ public class EitherOfBytes extends AbstractParser<Byte> {
             if(tmp == aByte) {
                 result = tmp;
                 status = Status.DONE;
-                break;
+                return;
             }
         }
         if(result == null) throw new ParseException("Expected byte not matched. Found: " + tmp);

@@ -22,7 +22,7 @@ public class RequestCodec {
     private final Queue<RequestMessage> messageQueue = new LinkedList<>();
 
     public RequestCodec() {
-        parser = new RequestParser(dataDeque);
+        parser = new RequestParser();
     }
 
     public void decode(Allocator.Resource<ByteBuffer> data) throws InternalException, ParseException {
@@ -31,18 +31,13 @@ public class RequestCodec {
         dataDeque.offer(data);
         while((data = dataDeque.poll()) != null) {
             byteBuffer = data.get();
-            if(!byteBuffer.hasRemaining()) {
-                data.release();
-                continue;
-            }
             parser.parse(data);
             if(parser.getStatus() == AbstractParser.Status.DONE) {
                 messageQueue.offer(parser.getResult());
-                parser = new RequestParser(dataDeque);
+                parser = new RequestParser();
             }
             if(byteBuffer.hasRemaining()) dataDeque.offerFirst(data);
         }
-        if(data != null) data.release();
     }
 
     public RequestMessage[] get() {

@@ -5,14 +5,12 @@ import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Deque;
 
 public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackParser<T> {
     private final ArrayList<P> parsers;
     int index;
 
-    public EitherOf(ArrayList<P> parsers, Deque<Allocator.Resource<ByteBuffer>> dataDeque) {
-        super(dataDeque);
+    public EitherOf(ArrayList<P> parsers) {
         this.parsers = parsers;
     }
 
@@ -20,24 +18,30 @@ public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackPa
     public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
         if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
-        ByteBuffer byteBuffer = data.get();
-        byteBuffer.mark();
-        while(byteBuffer.hasRemaining()) {
-            try {
-                P parser = parsers.get(index);
-                parser.parse(data);
-                if(parser.status == Status.DONE) {
-                    stack.clear();
-                    result = parser.result;
-                    status = Status.DONE;
-                    return;
+
+        dataDeque.offer(data);
+        outer:
+        while((data = dataDeque.poll()) != null) {
+            ByteBuffer byteBuffer = data.get();
+            MarkWrapper markWrapper = new MarkWrapper(data, byteBuffer.position());
+            while(byteBuffer.hasRemaining()) {
+                try {
+                    P parser = parsers.get(index);
+                    parser.parse(data);
+                    if(parser.status == Status.DONE) {
+                        stack.clear();
+                        result = parser.result;
+                        status = Status.DONE;
+                        return;
+                    }
+                    stack.offer(markWrapper);
+                } catch (ParseException exception) {
+                    index++;
+                    if(index == parsers.size()) throw exception;
+                    stack.offer(markWrapper);
+                    pushBack();
+                    break outer;
                 }
-                if(stack.peekLast() != data) stack.offer(data);
-            } catch (ParseException exception) {
-                index++;
-                if(stack.peekLast() != data) stack.offer(data);
-                pushBack();
-                if(index == parsers.size()) throw exception;
             }
         }
     }

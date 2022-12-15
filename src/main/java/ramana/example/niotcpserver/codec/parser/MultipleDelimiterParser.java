@@ -5,8 +5,8 @@ import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 
-public abstract class DelimiterParser<T> extends AbstractParser<T> {
-    private final byte delimiter;
+public abstract class MultipleDelimiterParser<T> extends AbstractParser<T> {
+    private final byte[] delimiters;
     protected Accumulator accumulator;
     private final int maxParseLength;
     private final int accumulatorCapacity;
@@ -14,11 +14,11 @@ public abstract class DelimiterParser<T> extends AbstractParser<T> {
     private int index;
 
     /*
-    * DelimiterParser is not suitable for repeatable (such as ZeroOrMore, OneOrMore) parsing as it
+    * MultipleDelimiterParser is not suitable for repeatable (such as ZeroOrMore, OneOrMore) parsing as it
     * rewinds the byte read when delimiter or breakpoint is reached.
     * */
-    public DelimiterParser(byte delimiter, byte breakPoint, int maxParseLength, int accumulatorCapacity) {
-        this.delimiter = delimiter;
+    public MultipleDelimiterParser(byte[] delimiters, byte breakPoint, int maxParseLength, int accumulatorCapacity) {
+        this.delimiters = delimiters;
         this.breakPoint = breakPoint;
         this.maxParseLength = maxParseLength;
         this.accumulatorCapacity = accumulatorCapacity;
@@ -32,11 +32,13 @@ public abstract class DelimiterParser<T> extends AbstractParser<T> {
         while(byteBuffer.hasRemaining()) {
             if(index == maxParseLength) throw new ParseException();
             byte tmp = byteBuffer.get();
-            if(tmp == delimiter) {
-                byteBuffer.position(byteBuffer.position() - 1);
-                composeResult();
-                status = Status.DONE;
-                return;
+            for (byte delimiter: delimiters) {
+                if(tmp == delimiter) {
+                    byteBuffer.position(byteBuffer.position() - 1);
+                    composeResult();
+                    status = Status.DONE;
+                    return;
+                }
             }
             if(tmp == breakPoint) {
                 byteBuffer.position(byteBuffer.position() - 1);
