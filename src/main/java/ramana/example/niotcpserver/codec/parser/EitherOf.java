@@ -20,7 +20,6 @@ public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackPa
         status = Status.IN_PROGRESS;
 
         dataDeque.offer(data);
-        outer:
         while((data = dataDeque.poll()) != null) {
             ByteBuffer byteBuffer = data.get();
             MarkWrapper markWrapper = new MarkWrapper(data, byteBuffer.position());
@@ -40,7 +39,7 @@ public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackPa
                     if(index == parsers.size()) throw exception;
                     stack.offer(markWrapper);
                     pushBack();
-                    break outer;
+                    break;
                 }
             }
         }

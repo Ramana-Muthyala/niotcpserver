@@ -14,14 +14,13 @@ public class ChunkedBodyParser extends CompositeParser<byte[]> {
     public ChunkedBodyParser(List<Field> headers) {
         this.headers = headers;
         parsers.add(new OneOrMore<>(new ChunkParser()));
-        parsers.add(new LastChunkParser());
         parsers.add(new ZeroOrMore<>(new FieldLineParser()));
         parsers.add(Util.createCRLFParser());
     }
 
     @Override
     protected byte[] composeResult() {
-        List<Field> trailers = (List<Field>) parsers.get(2).getResult();
+        List<Field> trailers = (List<Field>) parsers.get(1).getResult();
         if(trailers.size() > 0) {
             HashMap<String, Field> hashMap = new HashMap<>(Math.max(headers.size(), trailers.size()) * 2);
             for (Field field: trailers) {

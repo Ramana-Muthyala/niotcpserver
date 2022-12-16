@@ -11,6 +11,7 @@ public class ChunkParser extends AbstractParser<byte[]> {
     private final ByteSequence crlfParser;
     private final MultipleDelimiterStringParser chunkLenParser;
     private final DelimiterStringParser chunkExtParser;
+    private final LastChunkParser lastChunkParser;
     private State state = State.CHUNK_LEN;
     private int chunkLen;
     private FixedLengthParser chunkDataParser;
@@ -19,6 +20,7 @@ public class ChunkParser extends AbstractParser<byte[]> {
         chunkLenParser = new MultipleDelimiterStringParser(new byte[]{ Util.SEMI_COLON, Util.SP }, Util.CR, Util.REQ_CHUNK_LEN_MAX_LEN, Util.REQ_CHUNK_LEN_MAX_LEN);
         chunkExtParser = new DelimiterStringParser(Util.CR, Util.CR, Util.REQ_CHUNK_EXT_MAX_LEN, Util.REQ_CHUNK_EXT_MAX_LEN);
         crlfParser = Util.createCRLFParser();
+        lastChunkParser = new LastChunkParser();
     }
 
     @Override
@@ -55,6 +57,14 @@ public class ChunkParser extends AbstractParser<byte[]> {
                         status = Status.DONE;
                         return;
                     }
+                    break;
+                case LAST_CHUNK:
+                    lastChunkParser.parse(data);
+                    if(lastChunkParser.getStatus() == Status.DONE) {
+                        result = new byte[0];
+                        throw new ParseCompleteSignalException();
+                    }
+                    break;
             }
         }
     }
@@ -84,10 +94,14 @@ public class ChunkParser extends AbstractParser<byte[]> {
             } catch (NumberFormatException exception) {
                 throw new ParseException(exception);
             }
-            if(chunkLen <= 0) {
+            if(chunkLen < 0) {
                 throw new ParseException();
             }
-            state = State.CHUNK_EXT;
+            if(chunkLen == 0) {
+                state = State.LAST_CHUNK;
+            } else {
+                state = State.CHUNK_EXT;
+            }
         }
     }
 
@@ -99,8 +113,9 @@ public class ChunkParser extends AbstractParser<byte[]> {
         chunkLenParser.reset();
         chunkExtParser.reset();
         chunkDataParser = null;
+        // lastChunkParser need not be reset
         super.reset();
     }
 
-    private enum State {CHUNK_LEN, CHUNK_EXT, CRLF, CHUNK_DATA, LAST_CRLF}
+    private enum State {CHUNK_LEN, CHUNK_EXT, CRLF, CHUNK_DATA, LAST_CRLF, LAST_CHUNK}
 }

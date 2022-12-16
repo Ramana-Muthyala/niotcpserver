@@ -4,4 +4,7 @@ public class ParseCompleteSignalException extends ParseException {
     public ParseCompleteSignalException(Throwable throwable) {
         super(throwable);
     }
+
+    public ParseCompleteSignalException() {
+    }
 }
