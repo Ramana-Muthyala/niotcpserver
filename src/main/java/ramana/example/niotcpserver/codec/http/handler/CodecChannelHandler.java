@@ -28,6 +28,7 @@ public class CodecChannelHandler extends ChannelHandlerAdapter {
         try {
             requestCodec.decode((Allocator.Resource< ByteBuffer >)data);
         } catch (ParseException e) {
+            requestCodec.release();
             context.write(responseCodec.badRequest(context.allocator()));
             context.close();
         }
@@ -39,5 +40,11 @@ public class CodecChannelHandler extends ChannelHandlerAdapter {
     public void onWrite(Context.OnWrite context, Object data) throws InternalException {
         context.write(responseCodec.encode(context.allocator(), (ResponseMessage) data));
         context.flush();
+    }
+
+    @Override
+    public void onClose(Context.OnClose context, Object data, Throwable cause) throws InternalException {
+        requestCodec.release();
+        context.next(data, cause);
     }
 }

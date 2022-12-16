@@ -4,7 +4,23 @@ import ramana.example.niotcpserver.codec.parser.ByteSequence;
 import ramana.example.niotcpserver.codec.parser.EitherOfBytes;
 import ramana.example.niotcpserver.codec.parser.OneByte;
 
+import java.util.HashMap;
+
 public class Util {
+    public static final int STATUS_OK = 200;
+    public static final int STATUS_BAD_REQUEST = 400;
+    public static final int STATUS_INTERNAL_SERVER_ERROR = 500;
+    public static final int STATUS_NOT_IMPLEMENTED = 501;
+    public static final HashMap<Integer, String> statusCodeToText = new HashMap<>();
+    static {
+        statusCodeToText.put(STATUS_OK, "HTTP/1.1 200 OK");
+        statusCodeToText.put(STATUS_BAD_REQUEST, "HTTP/1.1 400 Bad Request");
+        statusCodeToText.put(STATUS_INTERNAL_SERVER_ERROR, "HTTP/1.1 500 Internal Server Error");
+        statusCodeToText.put(STATUS_NOT_IMPLEMENTED, "HTTP/1.1 501 Not Implemented");
+    }
+    public static final String METHOD_CONNECT = "CONNECT";
+    public static final String METHOD_HEAD = "HEAD";
+    public static final String METHOD_OPTIONS = "OPTIONS";
     public static final byte[] GET = "GET".getBytes();
     public static final byte[] HEAD = "HEAD".getBytes();
     public static final byte[] POST = "POST".getBytes();
@@ -20,6 +36,7 @@ public class Util {
     public static final byte SEMI_COLON = ';';
     public static final byte CR = '\r';
     public static final byte[] CRLF = new byte[] {'\r', '\n'};
+    public static final String CRLF_STRING = "\r\n";
     public static final byte[] HTTP_SLASH = "HTTP/".getBytes();
     public static final int REQ_TARGET_MAX_LEN = 512;
     public static final int REQ_FIELD_MAX_LEN = 128;
