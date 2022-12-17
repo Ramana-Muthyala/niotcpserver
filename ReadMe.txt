@@ -13,7 +13,7 @@ Design notes:
     1. Event loop mechanism.
     2. Thread per selector.
     3. Processing as of now is carried out in event loop itself.
-    4. Design permits can evolve to offload heavy processing to another thread pool.
+    4. Design permits and can evolve to offload heavy processing to another thread pool.
         As of now this is not implemented.
 
 
