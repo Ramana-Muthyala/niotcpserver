@@ -10,7 +10,11 @@ Event propagation (Channel handler chain):
         If current context methods are called after next is called, they are ignored (NoOp).
 
 
-
+For examples and test cases:
+    Refer test folder: src/test/java
+    Few samples to start with:
+        1. NIOTcpServer: src/test/java/ramana/example/niotcpserver/example/echo
+        2. Http codec: src/test/java/ramana/example/niotcpserver/example/codec/http
 
 
 
