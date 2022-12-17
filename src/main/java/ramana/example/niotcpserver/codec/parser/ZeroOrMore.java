@@ -5,9 +5,12 @@ import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
-public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractPushbackParser<List<T>> {
+public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractParser<List<T>> {
+    private final Deque<Allocator.Resource<ByteBuffer>> dataDeque = new LinkedList<>();
     private final P parser;
 
     public ZeroOrMore(P parser) {
@@ -20,38 +23,32 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractPushback
         if(status == Status.DONE) return;
         status = Status.IN_PROGRESS;
 
+        ByteBuffer byteBuffer = data.get();
         dataDeque.offer(data);
-        while((data = dataDeque.poll()) != null) {
-            ByteBuffer byteBuffer = data.get();
-            MarkWrapper markWrapper = new MarkWrapper(data, byteBuffer.position());
-            while(byteBuffer.hasRemaining()) {
-                try {
-                    parser.parse(data);
-                    if(parser.status == Status.DONE) {
-                        stack.clear();
-                        result.add(parser.result);
-                        parser.reset();
-                        markWrapper.mark(byteBuffer.position());
-                    }
-                } catch (ParseCompleteSignalException exception) {
-                    stack.clear();
+        while(byteBuffer.hasRemaining()) {
+            try {
+                parser.parse(data);
+                if(parser.status == Status.DONE) {
+                    dataDeque.clear();
+                    if(byteBuffer.hasRemaining()) dataDeque.offer(data);
                     result.add(parser.result);
-                    status = Status.DONE;
-                    return;
-                } catch (ParseException exception) {
-                    status = Status.DONE;
-                    return;
+                    parser.reset();
                 }
+            } catch (ParseCompleteSignalException exception) {
+                result.add(parser.result);
+                status = Status.DONE;
+                return;
+            } catch (ParseException exception) {
+                status = Status.DONE;
+                throw new ParseCompletePushBackSignalException(exception, dataDeque.peek());
             }
-            if(parser.status == Status.IN_PROGRESS) stack.offer(markWrapper);
-            if(status == Status.DONE) pushBack();
         }
     }
 
     @Override
     public void reset() {
         parser.reset();
-        stack.clear();
+        dataDeque.clear();
         result = new ArrayList<>();
         status = Status.NONE;
     }

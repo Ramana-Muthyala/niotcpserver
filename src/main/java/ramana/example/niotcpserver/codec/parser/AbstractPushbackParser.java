@@ -19,6 +19,18 @@ public abstract class AbstractPushbackParser<T> extends AbstractParser<T> {
         }
     }
 
+    protected void pushBack(Allocator.Resource<ByteBuffer> pushBackPoint) throws InternalException {
+        MarkWrapper wrapper;
+        while((wrapper = stack.pollLast()) != null) {
+            if(wrapper.resource == pushBackPoint) {
+                dataDeque.offerFirst(wrapper.resource); // do not reset pushBackPoint
+                return;
+            }
+            wrapper.reset();
+            dataDeque.offerFirst(wrapper.resource);
+        }
+    }
+
     @Override
     public void reset() {
         stack.clear();

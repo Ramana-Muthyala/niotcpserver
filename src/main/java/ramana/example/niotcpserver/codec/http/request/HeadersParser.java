@@ -1,10 +1,7 @@
 package ramana.example.niotcpserver.codec.http.request;
 
 import ramana.example.niotcpserver.codec.http.Util;
-import ramana.example.niotcpserver.codec.parser.AbstractParser;
-import ramana.example.niotcpserver.codec.parser.FixedLengthParser;
-import ramana.example.niotcpserver.codec.parser.ParseException;
-import ramana.example.niotcpserver.codec.parser.ZeroOrMore;
+import ramana.example.niotcpserver.codec.parser.*;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.types.InternalException;
 
@@ -22,10 +19,17 @@ public class HeadersParser extends ZeroOrMore<Field, FieldLineParser> {
 
     @Override
     public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
-        super.parse(data);
+        ParseCompletePushBackSignalException pushBackSignal = null;
+        try {
+            super.parse(data);
+        } catch (ParseCompletePushBackSignalException exception) {
+            pushBackSignal = exception;
+        }
+
         if(status == Status.DONE) {
             AbstractParser bodyParser = checkBodyProcessorHeaders(result);
             if(bodyParser != null) requestParser.add(bodyParser);
+            if(pushBackSignal != null) throw pushBackSignal;
         }
     }
 
