@@ -1,5 +1,5 @@
-NIOTcpServer
-============
+NIOTcpServer [Non blocking server]
+==================================
 
 Event propagation (Channel handler chain):
     1. Connect and read events propagate from first to last channel handlers.
