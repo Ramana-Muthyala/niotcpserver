@@ -7,7 +7,6 @@ import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.log.LogFactory;
 import ramana.example.niotcpserver.types.InternalException;
 import ramana.example.niotcpserver.types.Pair;
-import ramana.example.niotcpserver.util.CompletionSignal;
 import ramana.example.niotcpserver.util.Util;
 
 import java.net.SocketOption;
@@ -17,7 +16,7 @@ import java.util.logging.Logger;
 public class EchoClientNoDefaultRead {
     private static final Logger logger = LogFactory.getLogger();
 
-    public static void main(String[] args) throws CompletionSignal.CompletionSignalException, InterruptedException {
+    public static void main(String[] args) {
         Pair<SocketOption, Object>[] socketOptions = new Pair[]{};
         new Client().connect("localhost", 8080)
                 .socketOptions(socketOptions)

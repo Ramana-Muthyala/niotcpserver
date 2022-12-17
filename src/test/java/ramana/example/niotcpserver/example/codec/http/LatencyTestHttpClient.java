@@ -6,7 +6,6 @@ import ramana.example.niotcpserver.handler.impl.ChannelHandlerAdapter;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.log.LogFactory;
 import ramana.example.niotcpserver.types.InternalException;
-import ramana.example.niotcpserver.util.Util;
 
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;

@@ -2,7 +2,6 @@ package ramana.example.niotcpserver.example.codec.http;
 
 import ramana.example.niotcpserver.Bootstrap;
 import ramana.example.niotcpserver.codec.http.Processor;
-import ramana.example.niotcpserver.codec.http.RequestResponseHolder;
 import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.http.handler.CodecChannelHandler;
 import ramana.example.niotcpserver.codec.http.handler.ProcessorChannelHandler;
@@ -35,9 +34,7 @@ public class EchoHttpServer {
 
     public static class EchoProcessor implements Processor {
         @Override
-        public void process(RequestResponseHolder requestResponseHolder) {
-            RequestMessage requestMessage = requestResponseHolder.requestMessage;
-            ResponseMessage responseMessage = requestResponseHolder.responseMessage;
+        public void process(RequestMessage requestMessage, ResponseMessage responseMessage) {
             switch(requestMessage.method) {
                 case Util.METHOD_CONNECT:
                     responseMessage.statusCode = Util.STATUS_NOT_IMPLEMENTED;
