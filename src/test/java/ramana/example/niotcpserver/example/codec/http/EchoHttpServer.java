@@ -38,6 +38,9 @@ public class EchoHttpServer {
             switch(requestMessage.method) {
                 case Util.METHOD_CONNECT:
                     responseMessage.statusCode = Util.STATUS_NOT_IMPLEMENTED;
+                    ArrayList<String> values = new ArrayList<>();
+                    values.add(String.valueOf(0));
+                    responseMessage.headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
                     break;
                 case Util.METHOD_HEAD:
                     responseMessage.statusCode = Util.STATUS_OK;
