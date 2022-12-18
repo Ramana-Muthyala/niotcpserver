@@ -6,6 +6,11 @@ import ramana.example.niotcpserver.types.InternalException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
+/*
+* Parsers that throw ParseCompletePushBackSignalException (ZeroOrMore, OneOrMore) must not be used
+* with EitherOf as the context is different.
+* ParseCompletePushBackSignalException is not handled by EitherOf.
+* */
 public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackParser<T> {
     private final ArrayList<P> parsers;
     int index;
