@@ -1,6 +1,9 @@
 NIOTcpServer [Non blocking server]
 ==================================
 
+Note: Compile with Java 8. Run on Java 8 or above.
+
+Usage:
 Event propagation (Channel handler chain):
     1. Connect and read events propagate from first to last channel handlers.
     2. Write and close events propagate from last to first channel handlers (reverse order).
