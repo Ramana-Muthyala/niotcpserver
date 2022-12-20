@@ -24,11 +24,11 @@ public class LatencyTestHttpServer {
     public static class ChannelHandler extends ProcessorChannelHandler {
         @Override
         protected Processor create() {
-            return new EchoProcessor();
+            return new HelloProcessor();
         }
     }
 
-    public static class EchoProcessor implements Processor {
+    public static class HelloProcessor implements Processor {
         @Override
         public void process(RequestMessage requestMessage, ResponseMessage responseMessage) {
             responseMessage.statusCode = Util.STATUS_OK;
