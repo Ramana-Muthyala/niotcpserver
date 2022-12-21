@@ -12,11 +12,13 @@ import ramana.example.niotcpserver.types.InternalException;
 import java.util.ArrayList;
 
 public class HeaderParser extends AbstractStateParser {
+    private static final byte[] nameParserDelimiters = new byte[] { Util.COLON, Util.CR };
+    private static final byte[] valueParserDelimiters = new byte[] { Util.COMMA, Util.CR };
     private final RequestMessage requestMessage;
     private final ArrayList<Field> headers;
     private State state = State.HEADER_NAME;
-    private final StringAccumulatorParser nameParser = new StringAccumulatorParser(Util.COLON, Util.CR, Util.REQ_FIELD_MAX_LEN, Util.REQ_FIELD_MAX_LEN);
-    private final StringAccumulatorParser valueParser = new StringAccumulatorParser(Util.COMMA, Util.CR, Util.REQ_FIELD_VAL_MAX_LEN, Util.REQ_FIELD_VAL_MAX_LEN);
+    private final StringAccumulatorParser nameParser = new StringAccumulatorParser(nameParserDelimiters, Util.REQ_FIELD_MAX_LEN, Util.REQ_FIELD_MAX_LEN);
+    private final StringAccumulatorParser valueParser = new StringAccumulatorParser(valueParserDelimiters, Util.REQ_FIELD_VAL_MAX_LEN, Util.REQ_FIELD_VAL_MAX_LEN);
     private String name;
     private ArrayList<String> values = new ArrayList<>();
 
