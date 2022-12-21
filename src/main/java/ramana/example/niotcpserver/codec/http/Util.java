@@ -1,7 +1,7 @@
 package ramana.example.niotcpserver.codec.http;
 
 import ramana.example.niotcpserver.codec.parser.ByteSequence;
-import ramana.example.niotcpserver.codec.parser.EitherOfBytes;
+import ramana.example.niotcpserver.codec.parser.ByteRange;
 import ramana.example.niotcpserver.codec.parser.OneByte;
 
 import java.util.HashMap;
@@ -13,6 +13,7 @@ public class Util {
     public static final int STATUS_INTERNAL_SERVER_ERROR = 500;
     public static final int STATUS_NOT_IMPLEMENTED = 501;
     public static final HashMap<Integer, String> statusCodeToText = new HashMap<>();
+
     static {
         statusCodeToText.put(STATUS_OK, "HTTP/1.1 200 OK");
         statusCodeToText.put(STATUS_BAD_REQUEST, "HTTP/1.1 400 Bad Request");
@@ -32,15 +33,25 @@ public class Util {
     public static final byte[] CONNECT = "CONNECT".getBytes();
     public static final byte[] OPTIONS = "OPTIONS".getBytes();
     public static final byte[] TRACE = "TRACE".getBytes();
+    public static final byte ZERO = '0';
+    public static final byte NINE = '9';
     public static final byte SP = ' ';
+    public static final byte QUESTION_MARK = '?';
+    public static final byte EQUAL_TO = '=';
+    public static final byte AMPERSAND = '&';
     public static final byte DOT = '.';
     public static final byte COMMA = ',';
     public static final byte COLON = ':';
     public static final byte SEMI_COLON = ';';
+    public static final byte SLASH = '/';
     public static final byte CR = '\r';
+    public static final byte LF = '\n';
     public static final byte[] CRLF = new byte[] {'\r', '\n'};
     public static final String CRLF_STRING = "\r\n";
     public static final byte[] HTTP_SLASH = "HTTP/".getBytes();
+
+    // ABSOLUTE_FORM_SCHEMA is http:// but h would have been already consumed while parsing.
+    public static final byte[] ABSOLUTE_FORM_SCHEMA = "ttp://".getBytes();
     public static final int REQ_TARGET_MAX_LEN = 512;
     public static final int REQ_FIELD_MAX_LEN = 128;
     public static final int REQ_FIELD_VAL_MAX_LEN = 512;
@@ -55,8 +66,8 @@ public class Util {
         return new OneByte(SP);
     }
 
-    public static EitherOfBytes createDigitParser() {
-        return new EitherOfBytes(new byte[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'});
+    public static ByteRange createDigitParser() {
+        return new ByteRange((byte) '0', (byte) '9');
     }
 
     public static OneByte createDotParser() {

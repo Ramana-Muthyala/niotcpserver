@@ -41,7 +41,6 @@ public class RequestCodecTest {
         } while (index != input.length);
 
         RequestMessage requestMessage = requestCodec.get()[0];
-        assertEquals(RequestMessage.class, requestMessage.getClass());
         assertEquals("TRACE", requestMessage.method);
         assertEquals("", requestMessage.path);
         assertEquals(0, requestMessage.queryParameters.size());
@@ -78,7 +77,6 @@ public class RequestCodecTest {
         } while (index != input.length);
 
         RequestMessage requestMessage = requestCodec.get()[0];
-        assertEquals(RequestMessage.class, requestMessage.getClass());
         assertEquals("GET", requestMessage.method);
         assertEquals("index.html", requestMessage.path);
         assertEquals(1, requestMessage.queryParameters.size());
@@ -119,7 +117,6 @@ public class RequestCodecTest {
         } while (index != input.length);
 
         RequestMessage requestMessage = requestCodec.get()[0];
-        assertEquals(RequestMessage.class, requestMessage.getClass());
         assertEquals("POST", requestMessage.method);
         assertEquals("index.html", requestMessage.path);
         assertEquals(1, requestMessage.queryParameters.size());
@@ -187,7 +184,6 @@ public class RequestCodecTest {
         } while (index != input.length);
 
         RequestMessage requestMessage = requestCodec.get()[0];
-        assertEquals(RequestMessage.class, requestMessage.getClass());
         assertEquals("POST", requestMessage.method);
         assertEquals("index.html", requestMessage.path);
         assertEquals(1, requestMessage.queryParameters.size());

@@ -1,12 +1,12 @@
-package ramana.example.niotcpserver.example.codec.http;
+package ramana.example.niotcpserver.example.codec.http.v1;
 
 import ramana.example.niotcpserver.Bootstrap;
-import ramana.example.niotcpserver.codec.http.Processor;
 import ramana.example.niotcpserver.codec.http.Util;
-import ramana.example.niotcpserver.codec.http.handler.CodecChannelHandler;
-import ramana.example.niotcpserver.codec.http.handler.ProcessorChannelHandler;
+import ramana.example.niotcpserver.codec.http.handler.v1.CodecChannelHandler;
+import ramana.example.niotcpserver.codec.http.v1.Processor;
+import ramana.example.niotcpserver.codec.http.handler.v1.ProcessorChannelHandler;
 import ramana.example.niotcpserver.codec.http.request.Field;
-import ramana.example.niotcpserver.codec.http.request.RequestMessage;
+import ramana.example.niotcpserver.codec.http.request.v1.RequestMessage;
 import ramana.example.niotcpserver.codec.http.response.ResponseMessage;
 
 import java.util.ArrayList;

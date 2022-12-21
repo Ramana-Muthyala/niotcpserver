@@ -28,4 +28,4 @@ For examples and test cases:
         1. NIOTcpServer: src/test/java/ramana/example/niotcpserver/example/echo
         2. Http codec: src/test/java/ramana/example/niotcpserver/example/codec/http
 
-
+Note: (In progress): v1 http codec is in progress.

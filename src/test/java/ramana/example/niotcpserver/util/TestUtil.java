@@ -36,6 +36,18 @@ public class TestUtil {
         logger.info("Content: " + ((requestMessage.body == null) ? null : new String(requestMessage.body)));
     }
 
+    public static void print(ramana.example.niotcpserver.codec.http.request.v1.RequestMessage requestMessage) {
+        logger.info("Method: " + requestMessage.method + " Path: " + requestMessage.path);
+        logger.info("queryParameters: " + requestMessage.queryParameters);
+        logger.info("Headers: ");
+        if(requestMessage.headers != null) {
+            for (Field header: requestMessage.headers) {
+                logger.info(header.name + ": " + header.values);
+            }
+        }
+        logger.info("Content: " + ((requestMessage.body == null) ? null : new String(requestMessage.body)));
+    }
+
     public static int getContentLength(List<Field> headers) {
         for (Field header: headers) {
             if(Util.REQ_HEADER_CONTENT_LENGTH.equals(header.name)) {

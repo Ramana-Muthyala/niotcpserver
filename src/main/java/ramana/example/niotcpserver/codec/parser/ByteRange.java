@@ -5,11 +5,14 @@ import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 
-public class EitherOfBytes extends AbstractParser<Byte> {
-    private final byte[] bytesToCompare;
+public class ByteRange extends AbstractParser<Byte> {
 
-    public EitherOfBytes(byte[] bytesToCompare) {
-        this.bytesToCompare = bytesToCompare;
+    private final byte from;
+    private final byte to;
+
+    public ByteRange(byte from, byte to) {
+        this.from = from;
+        this.to = to;
     }
 
     @Override
@@ -19,13 +22,7 @@ public class EitherOfBytes extends AbstractParser<Byte> {
         ByteBuffer byteBuffer = data.get();
         if(!byteBuffer.hasRemaining()) return;
         byte tmp = byteBuffer.get();
-        for (byte aByte: bytesToCompare) {
-            if(tmp == aByte) {
-                result = tmp;
-                status = Status.DONE;
-                return;
-            }
-        }
-        if(result == null) throw new ParseException("Expected byte not matched. Found: " + tmp);
+        if(tmp < from  ||  tmp > to) throw new ParseException("Expected range: from: " + from + ", to: " + to + ". Found: " + tmp);
+        status = Status.DONE;
     }
 }

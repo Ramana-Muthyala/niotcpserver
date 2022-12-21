@@ -25,4 +25,8 @@ public class Accumulator {
     public String getAsString() {
         return new String(data, 0, index);
     }
+
+    public void reset() {
+        index = 0;
+    }
 }
