@@ -33,4 +33,10 @@ public class SkipParser implements ByteParser<Byte> {
     public Byte getResult() {
         return result;
     }
+
+    @Override
+    public void reset() {
+        index = 0;
+        result = null;
+    }
 }

@@ -29,13 +29,11 @@ public class ChunkedBodyParser extends CompositeParser<byte[]> {
             for (Field field: headers) {
                 hashMap.put(field.name, field);
             }
-            hashMap.get(Util.REQ_HEADER_TRANSFER_ENCODING).values.remove(Util.REQ_HEADER_TRANSFER_ENCODING_CHUNKED);
             headers.clear();
             headers.addAll(hashMap.values());
-        } else {
-            headers.stream().filter(field -> Util.REQ_HEADER_TRANSFER_ENCODING.equals(field.name))
-                    .forEach(field -> field.values.remove(Util.REQ_HEADER_TRANSFER_ENCODING_CHUNKED));
         }
+        headers.stream().filter(field -> Util.REQ_HEADER_TRANSFER_ENCODING.equals(field.name))
+                .forEach(field -> field.values.remove(Util.REQ_HEADER_TRANSFER_ENCODING_CHUNKED));
 
         int tmp = 0;
         List<byte[]> list = (List<byte[]>) parsers.get(0).getResult();

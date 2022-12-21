@@ -27,4 +27,9 @@ public class ByteSequence implements ByteParser<byte[]> {
     public byte[] getResult() {
         return byteSequence;
     }
+
+    @Override
+    public void reset() {
+        index = 0;
+    }
 }

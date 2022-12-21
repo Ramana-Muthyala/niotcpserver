@@ -40,4 +40,11 @@ public class EitherOf<T, P extends ByteParser<T>> implements ByteParser<T> {
     public T getResult() {
         return result;
     }
+
+    @Override
+    public void reset() {
+        index = 0;
+        result = null;
+        parsers.forEach(ByteParser::reset);
+    }
 }
