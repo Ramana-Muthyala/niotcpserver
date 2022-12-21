@@ -21,6 +21,8 @@ public class Buffer {
     private int byteIndex;
 
     public void mark() throws InternalException {
+        mark = true;
+        if(resource == null) return;
         ByteBuffer byteBuffer = resource.get();
         if(byteBuffer.hasRemaining()) {
             byte[] tmp = new byte[byteBuffer.limit() - byteBuffer.position()];
@@ -29,7 +31,6 @@ public class Buffer {
             }
             data.add(tmp);
         }
-        mark = true;
         resource.release();
         resource = null;
     }
