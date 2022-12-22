@@ -26,6 +26,7 @@ For examples and test cases:
     Refer test folder: src/test/java
     Few samples to start with:
         1. NIOTcpServer: src/test/java/ramana/example/niotcpserver/example/echo
-        2. Http codec: src/test/java/ramana/example/niotcpserver/example/codec/http
+        2. Http codec:
+                src/test/java/ramana/example/niotcpserver/example/codec/http
+                src/test/java/ramana/example/niotcpserver/example/codec/http/v1
 
-Note: (In progress): v1 http codec is in progress.
