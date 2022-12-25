@@ -6,10 +6,16 @@ import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class ResponseCodec {
     private static final ResponseCodec self = new ResponseCodec();
+    private static final ArrayList<String> contentLengthZero = new ArrayList<>(1);
+    static {
+        contentLengthZero.add(String.valueOf(0));
+    }
+    private static final Field contentLengthZeroHeader = new Field(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthZero);
 
     private ResponseCodec() {}
 
@@ -54,6 +60,7 @@ public class ResponseCodec {
     public ResponseMessage badRequest() {
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.statusCode = Util.STATUS_BAD_REQUEST;
+        responseMessage.headers.add(contentLengthZeroHeader);
         return responseMessage;
     }
 }

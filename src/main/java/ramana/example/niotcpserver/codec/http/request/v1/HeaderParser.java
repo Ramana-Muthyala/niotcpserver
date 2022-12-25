@@ -83,7 +83,7 @@ public class HeaderParser extends AbstractStateParser {
             for (Field header: headers) {
                 if(Util.REQ_HEADER_CONTENT_LENGTH.equals(header.name)) {
                     try {
-                        contentLength = Integer.parseInt(header.values.get(0));
+                        contentLength = Integer.parseInt(header.values.get(0).trim());
                     } catch (IndexOutOfBoundsException | NumberFormatException exception) {
                         throw new ParseException(exception);
                     }
