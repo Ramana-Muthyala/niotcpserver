@@ -12,10 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Util {
-    public static String classPathToNormalizedPath(String path) {
-        return Util.class.getResource(path).getPath().substring(1).replaceAll("%20", " ");
-    }
-
     public static <T> LinkedList<T> createLinkedList(List<Class<? extends T>> classList) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         LinkedList<T> list = new LinkedList<>();
         for (Class<? extends T> clazz: classList) {

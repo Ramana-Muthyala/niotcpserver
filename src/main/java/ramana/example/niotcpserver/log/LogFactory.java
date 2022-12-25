@@ -1,14 +1,21 @@
 package ramana.example.niotcpserver.log;
 
-import ramana.example.niotcpserver.util.Util;
-
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class LogFactory {
     private static final Logger logger;
 
     static {
-        System.setProperty("java.util.logging.config.file", Util.classPathToNormalizedPath("/logging.properties"));
+        try {
+            InputStream in = LogFactory.class.getResourceAsStream("/logging.properties");
+            LogManager.getLogManager().readConfiguration(in);
+            in.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         logger = Logger.getLogger("ramana.example.niotcpserver");
     }
 
