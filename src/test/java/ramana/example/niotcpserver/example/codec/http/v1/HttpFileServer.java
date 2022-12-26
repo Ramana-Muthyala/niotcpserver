@@ -31,13 +31,27 @@ public class HttpFileServer {
     }
 
     public static class ChannelHandler extends ProcessorChannelHandler {
+        private static final FileServer fileServer = new FileServer();
         @Override
         protected Processor create() {
-            return new FileServer();
+            // Stateless processors do not have to be instantiated for each channel.
+            return fileServer;
         }
     }
 
     public static class FileServer implements Processor {
+        private static final List<Field> allowedMethodsResponseHeaders = new ArrayList<>(2);
+        private static final ArrayList<String> allowedMethodsValues = new ArrayList<>();
+        private static final ArrayList<String> contentLengthValues = new ArrayList<>(1);
+        private static final Field contentLengthHeader = new Field(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthValues);
+        static {
+            allowedMethodsValues.add("GET");
+            allowedMethodsValues.add("HEAD");
+            allowedMethodsValues.add("OPTIONS");
+            allowedMethodsResponseHeaders.add(new Field("Allow", allowedMethodsValues));
+            contentLengthValues.add(String.valueOf(0));
+            allowedMethodsResponseHeaders.add(contentLengthHeader);
+        }
         @Override
         public void process(RequestMessage requestMessage, ResponseMessage responseMessage) {
             switch(requestMessage.method) {
@@ -49,13 +63,11 @@ public class HttpFileServer {
                     break;
                 case Util.METHOD_OPTIONS:
                     responseMessage.statusCode = Util.STATUS_OK;
-                    responseMessage.headers = allowedMethods();
+                    responseMessage.headers = allowedMethodsResponseHeaders;
                     break;
                 default:
                     responseMessage.statusCode = Util.STATUS_NOT_IMPLEMENTED;
-                    ArrayList<String> values = new ArrayList<>();
-                    values.add(String.valueOf(0));
-                    responseMessage.headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
+                    responseMessage.headers.add(contentLengthHeader);
             }
         }
 
@@ -93,19 +105,6 @@ public class HttpFileServer {
             responseMessage.body = content;
             values.add(String.valueOf(content.length));
             responseMessage.headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
-        }
-
-        private List<Field> allowedMethods() {
-            List<Field> headers = new ArrayList<>(1);
-            ArrayList<String> values = new ArrayList<>();
-            values.add("GET");
-            values.add("HEAD");
-            values.add("OPTIONS");
-            headers.add(new Field("Allow", values));
-            values = new ArrayList<>();
-            values.add(String.valueOf(0));
-            headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
-            return headers;
         }
     }
 }

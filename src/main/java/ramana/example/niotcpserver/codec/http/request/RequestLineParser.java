@@ -30,6 +30,7 @@ public class RequestLineParser extends CompositeParser<RequestLine> {
         methodParsers.add(new ByteSequence(Util.CONNECT));
         methodParsers.add(new ByteSequence(Util.OPTIONS));
         methodParsers.add(new ByteSequence(Util.TRACE));
+        methodParsers.add(new ByteSequence(Util.PATCH));
         return methodParsers;
     }
 

@@ -26,28 +26,42 @@ public class EchoHttpServer {
     }
 
     public static class ChannelHandler extends ProcessorChannelHandler {
+        private static final EchoProcessor echoProcessor = new EchoProcessor();
         @Override
         protected Processor create() {
-            return new EchoProcessor();
+            // Stateless processors do not have to be instantiated for each channel.
+            return echoProcessor;
         }
     }
 
     public static class EchoProcessor implements Processor {
+        private static final List<Field> allowedMethodsResponseHeaders = new ArrayList<>(2);
+        private static final ArrayList<String> allowedMethodsValues = new ArrayList<>();
+        private static final ArrayList<String> contentLengthValues = new ArrayList<>(1);
+        private static final Field contentLengthHeader = new Field(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthValues);
+        static {
+            allowedMethodsValues.add("GET");
+            allowedMethodsValues.add("HEAD");
+            allowedMethodsValues.add("POST");
+            allowedMethodsValues.add("PUT");
+            allowedMethodsValues.add("DELETE");
+            allowedMethodsValues.add("OPTIONS");
+            allowedMethodsValues.add("TRACE");
+            allowedMethodsValues.add("PATCH");
+            allowedMethodsResponseHeaders.add(new Field("Allow", allowedMethodsValues));
+            contentLengthValues.add(String.valueOf(0));
+            allowedMethodsResponseHeaders.add(contentLengthHeader);
+        }
+
         @Override
         public void process(RequestMessage requestMessage, ResponseMessage responseMessage) {
             switch(requestMessage.method) {
-                case Util.METHOD_CONNECT:
-                    responseMessage.statusCode = Util.STATUS_NOT_IMPLEMENTED;
-                    ArrayList<String> values = new ArrayList<>();
-                    values.add(String.valueOf(0));
-                    responseMessage.headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
-                    break;
                 case Util.METHOD_HEAD:
                     responseMessage.statusCode = Util.STATUS_OK;
                     break;
                 case Util.METHOD_OPTIONS:
                     responseMessage.statusCode = Util.STATUS_OK;
-                    responseMessage.headers = allowedMethods();
+                    responseMessage.headers = allowedMethodsResponseHeaders;
                     break;
                 default:
                     echo(requestMessage, responseMessage);
@@ -89,23 +103,6 @@ public class EchoHttpServer {
             ArrayList<String> values = new ArrayList<>();
             values.add(String.valueOf(capacity));
             responseMessage.headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
-        }
-
-        private List<Field> allowedMethods() {
-            List<Field> headers = new ArrayList<>(1);
-            ArrayList<String> values = new ArrayList<>();
-            values.add("GET");
-            values.add("HEAD");
-            values.add("POST");
-            values.add("PUT");
-            values.add("DELETE");
-            values.add("OPTIONS");
-            values.add("TRACE");
-            headers.add(new Field("Allow", values));
-            values = new ArrayList<>();
-            values.add(String.valueOf(0));
-            headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
-            return headers;
         }
     }
 }

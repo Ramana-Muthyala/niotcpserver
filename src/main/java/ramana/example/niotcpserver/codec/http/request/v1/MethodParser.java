@@ -23,6 +23,7 @@ public class MethodParser extends AbstractStateParser {
         parsers.add(new ByteSequence(Util.CONNECT));
         parsers.add(new ByteSequence(Util.OPTIONS));
         parsers.add(new ByteSequence(Util.TRACE));
+        parsers.add(new ByteSequence(Util.PATCH));
         this.parser = new EitherOf<>(parsers);
     }
 

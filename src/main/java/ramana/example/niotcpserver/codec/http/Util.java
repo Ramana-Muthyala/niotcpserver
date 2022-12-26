@@ -35,6 +35,7 @@ public class Util {
     public static final byte[] CONNECT = "CONNECT".getBytes();
     public static final byte[] OPTIONS = "OPTIONS".getBytes();
     public static final byte[] TRACE = "TRACE".getBytes();
+    public static final byte[] PATCH = "PATCH".getBytes();
     public static final byte ZERO = '0';
     public static final byte NINE = '9';
     public static final byte SP = ' ';

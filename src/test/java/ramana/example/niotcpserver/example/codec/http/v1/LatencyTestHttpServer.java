@@ -23,20 +23,27 @@ public class LatencyTestHttpServer {
     }
 
     public static class ChannelHandler extends ProcessorChannelHandler {
+        private static final HelloProcessor helloProcessor = new HelloProcessor();
         @Override
         protected Processor create() {
-            return new HelloProcessor();
+            // Stateless processors do not have to be instantiated for each channel.
+            return helloProcessor;
         }
     }
 
     public static class HelloProcessor implements Processor {
+        private static final byte[] message = "Hello World !!".getBytes();
+        private static final ArrayList<String> values = new ArrayList<>(1);
+        static {
+            values.add(String.valueOf(message.length));
+        }
+        private static final Field contentLengthHeader = new Field(Util.REQ_HEADER_CONTENT_LENGTH, values);
+
         @Override
         public void process(RequestMessage requestMessage, ResponseMessage responseMessage) {
             responseMessage.statusCode = Util.STATUS_OK;
-            responseMessage.body = "Hello World !!".getBytes();
-            ArrayList<String> values = new ArrayList<>(1);
-            values.add(String.valueOf(responseMessage.body.length));
-            responseMessage.headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
+            responseMessage.body = message;
+            responseMessage.headers.add(contentLengthHeader);
         }
     }
 }
