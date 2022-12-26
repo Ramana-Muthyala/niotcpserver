@@ -21,6 +21,8 @@ Design notes:
 
 
 Http codec: Minimalistic and lenient implementation is given for demonstration purpose.
+                Not all status codes are implemented. Most of the use cases are covered.
+                For status codes, refer: src/main/java/ramana/example/niotcpserver/codec/http/Util.java
 
 For examples and test cases:
     Refer test folder: src/test/java

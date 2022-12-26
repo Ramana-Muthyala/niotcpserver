@@ -52,7 +52,7 @@ public class HeaderParser extends AbstractStateParser {
                 case HEADER_VALUE:
                     status = valueParser.parse(buffer);
                     if(status == ByteParser.Status.DONE) {
-                        String value = valueParser.getResult();
+                        String value = valueParser.getResult().trim();
                         if(value.isEmpty()) throw new ParseException();
                         values.add(value);
                         if(valueParser.getLastRead() == Util.CR) {
@@ -83,7 +83,7 @@ public class HeaderParser extends AbstractStateParser {
             for (Field header: headers) {
                 if(Util.REQ_HEADER_CONTENT_LENGTH.equals(header.name)) {
                     try {
-                        contentLength = Integer.parseInt(header.values.get(0).trim());
+                        contentLength = Integer.parseInt(header.values.get(0));
                     } catch (IndexOutOfBoundsException | NumberFormatException exception) {
                         throw new ParseException(exception);
                     }
