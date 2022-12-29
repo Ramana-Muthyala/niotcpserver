@@ -1,12 +1,12 @@
 package ramana.example.niotcpserver.util;
 
-import ramana.example.niotcpserver.codec.http.request.Field;
-import ramana.example.niotcpserver.codec.http.request.RequestMessage;
 import ramana.example.niotcpserver.codec.http.Util;
+import ramana.example.niotcpserver.codec.http.request.RequestMessage;
 import ramana.example.niotcpserver.log.LogFactory;
 import ramana.example.niotcpserver.types.LinkedList;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class TestUtil {
@@ -30,8 +30,8 @@ public class TestUtil {
         logger.info("Method: " + requestMessage.method + " Path: " + requestMessage.path);
         logger.info("queryParameters: " + requestMessage.queryParameters);
         logger.info("Headers: ");
-        for (Field header: requestMessage.headers) {
-            logger.info(header.name + ": " + header.values);
+        for (Map.Entry<String, ArrayList<String>> header: requestMessage.headers.entrySet()) {
+            logger.info(header.getKey() + ": " + header.getValue());
         }
         logger.info("Content: " + ((requestMessage.body == null) ? null : new String(requestMessage.body)));
     }
@@ -41,18 +41,16 @@ public class TestUtil {
         logger.info("queryParameters: " + requestMessage.queryParameters);
         logger.info("Headers: ");
         if(requestMessage.headers != null) {
-            for (Field header: requestMessage.headers) {
-                logger.info(header.name + ": " + header.values);
+            for (Map.Entry<String, ArrayList<String>> header: requestMessage.headers.entrySet()) {
+                logger.info(header.getKey() + ": " + header.getValue());
             }
         }
         logger.info("Content: " + ((requestMessage.body == null) ? null : new String(requestMessage.body)));
     }
 
-    public static int getContentLength(List<Field> headers) {
-        for (Field header: headers) {
-            if(Util.REQ_HEADER_CONTENT_LENGTH.equals(header.name)) {
-                return Integer.parseInt(header.values.get(0));
-            }
+    public static int getContentLength(Map<String, ArrayList<String>> headers) {
+        if(headers.containsKey(Util.REQ_HEADER_CONTENT_LENGTH)) {
+            return Integer.parseInt(headers.get(Util.REQ_HEADER_CONTENT_LENGTH).get(0));
         }
         return 0;
     }

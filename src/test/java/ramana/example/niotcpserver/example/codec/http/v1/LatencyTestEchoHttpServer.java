@@ -4,14 +4,13 @@ import ramana.example.niotcpserver.Bootstrap;
 import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.http.handler.v1.CodecChannelHandler;
 import ramana.example.niotcpserver.codec.http.handler.v1.ProcessorChannelHandler;
-import ramana.example.niotcpserver.codec.http.request.Field;
 import ramana.example.niotcpserver.codec.http.request.v1.RequestMessage;
 import ramana.example.niotcpserver.codec.http.response.ResponseMessage;
 import ramana.example.niotcpserver.codec.http.v1.Processor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class LatencyTestEchoHttpServer {
@@ -35,10 +34,10 @@ public class LatencyTestEchoHttpServer {
     }
 
     public static class EchoProcessor implements Processor {
-        private static final List<Field> allowedMethodsResponseHeaders = new ArrayList<>(2);
+        private static final Map<String, ArrayList<String>> allowedMethodsResponseHeaders = new HashMap<>();
         private static final ArrayList<String> allowedMethodsValues = new ArrayList<>();
         private static final ArrayList<String> contentLengthValues = new ArrayList<>(1);
-        private static final Field contentLengthHeader = new Field(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthValues);
+
         static {
             allowedMethodsValues.add("GET");
             allowedMethodsValues.add("HEAD");
@@ -48,9 +47,9 @@ public class LatencyTestEchoHttpServer {
             allowedMethodsValues.add("OPTIONS");
             allowedMethodsValues.add("TRACE");
             allowedMethodsValues.add("PATCH");
-            allowedMethodsResponseHeaders.add(new Field("Allow", allowedMethodsValues));
+            allowedMethodsResponseHeaders.put("Allow", allowedMethodsValues);
             contentLengthValues.add(String.valueOf(0));
-            allowedMethodsResponseHeaders.add(contentLengthHeader);
+            allowedMethodsResponseHeaders.put(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthValues);
         }
 
         @Override
@@ -58,7 +57,7 @@ public class LatencyTestEchoHttpServer {
             switch(requestMessage.method) {
                 case Util.METHOD_CONNECT:
                     responseMessage.statusCode = Util.STATUS_NOT_IMPLEMENTED;
-                    responseMessage.headers.add(contentLengthHeader);
+                    responseMessage.headers.put(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthValues);
                     break;
                 case Util.METHOD_HEAD:
                     responseMessage.statusCode = Util.STATUS_OK;
@@ -84,9 +83,9 @@ public class LatencyTestEchoHttpServer {
             }
             builder.append(Util.CRLF_STRING);
 
-            for (Field header: requestMessage.headers) {
-                builder.append(header.name).append((char)Util.COLON);
-                Iterator<String> iterator = header.values.iterator();
+            for (Map.Entry<String, ArrayList<String>> header: requestMessage.headers.entrySet()) {
+                builder.append(header.getKey()).append((char)Util.COLON);
+                Iterator<String> iterator = header.getValue().iterator();
                 while(iterator.hasNext()) {
                     builder.append(iterator.next());
                     if(iterator.hasNext()) builder.append((char)Util.COMMA);
@@ -106,7 +105,7 @@ public class LatencyTestEchoHttpServer {
 
             ArrayList<String> values = new ArrayList<>();
             values.add(String.valueOf(capacity));
-            responseMessage.headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
+            responseMessage.headers.put(Util.REQ_HEADER_CONTENT_LENGTH, values);
         }
     }
 }

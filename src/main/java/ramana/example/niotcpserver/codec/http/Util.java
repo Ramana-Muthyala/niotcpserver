@@ -1,10 +1,14 @@
 package ramana.example.niotcpserver.codec.http;
 
+import ramana.example.niotcpserver.codec.http.request.Field;
 import ramana.example.niotcpserver.codec.parser.ByteSequence;
 import ramana.example.niotcpserver.codec.parser.ByteRange;
 import ramana.example.niotcpserver.codec.parser.OneByte;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Util {
     public static final int STATUS_CONTINUE = 100;
@@ -121,5 +125,13 @@ public class Util {
 
     public static ByteSequence createCRLFParser() {
         return new ByteSequence(CRLF);
+    }
+
+    public static Map<String, ArrayList<String>> toMap(List<Field> headers) {
+        HashMap<String, ArrayList<String>> map = new HashMap<>(headers.size() * 2);
+        for (Field field: headers) {
+            map.put(field.name, field.values);
+        }
+        return map;
     }
 }

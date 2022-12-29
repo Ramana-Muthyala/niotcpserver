@@ -10,14 +10,13 @@ import ramana.example.niotcpserver.codec.parser.v1.StringAccumulatorParser;
 import ramana.example.niotcpserver.types.InternalException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 public class TrailerParser extends AbstractStateParser {
     private static final byte[] nameParserDelimiters = new byte[] { Util.COLON, Util.CR };
     private static final byte[] valueParserDelimiters = new byte[] { Util.COMMA, Util.CR };
     private final ArrayList<Field> trailers;
-    private final List<Field> headers;
+    private final Map<String, ArrayList<String>> headers;
     private State state = State.TRAILER_NAME;
     private final StringAccumulatorParser nameParser = new StringAccumulatorParser(nameParserDelimiters, Util.REQ_FIELD_MAX_LEN, Util.REQ_FIELD_MAX_LEN);
     private final StringAccumulatorParser valueParser = new StringAccumulatorParser(valueParserDelimiters, Util.REQ_FIELD_VAL_MAX_LEN, Util.REQ_FIELD_VAL_MAX_LEN);
@@ -80,19 +79,10 @@ public class TrailerParser extends AbstractStateParser {
             done = true;
             next = null;
 
-            if(trailers.size() > 0) {
-                HashMap<String, Field> hashMap = new HashMap<>(Math.max(headers.size(), trailers.size()) * 2);
-                for (Field field: trailers) {
-                    hashMap.put(field.name, field);
-                }
-                for (Field field: headers) {
-                    hashMap.put(field.name, field);
-                }
-                headers.clear();
-                headers.addAll(hashMap.values());
+            for (Field trailer: trailers) {
+                if(!headers.containsKey(trailer.name)) headers.put(trailer.name, trailer.values);
             }
-            headers.stream().filter(field -> Util.REQ_HEADER_TRANSFER_ENCODING.equals(field.name))
-                    .forEach(field -> field.values.remove(Util.REQ_HEADER_TRANSFER_ENCODING_CHUNKED));
+            headers.get(Util.REQ_HEADER_TRANSFER_ENCODING).remove(Util.REQ_HEADER_TRANSFER_ENCODING_CHUNKED);
         }
     }
 

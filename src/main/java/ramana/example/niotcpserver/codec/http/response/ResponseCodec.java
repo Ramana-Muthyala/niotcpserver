@@ -1,13 +1,13 @@
 package ramana.example.niotcpserver.codec.http.response;
 
 import ramana.example.niotcpserver.codec.http.Util;
-import ramana.example.niotcpserver.codec.http.request.Field;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 public class ResponseCodec {
     private static final ResponseCodec self = new ResponseCodec();
@@ -15,7 +15,6 @@ public class ResponseCodec {
     static {
         contentLengthZero.add(String.valueOf(0));
     }
-    private static final Field contentLengthZeroHeader = new Field(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthZero);
 
     private ResponseCodec() {}
 
@@ -33,9 +32,9 @@ public class ResponseCodec {
         if(statusMessage == null) statusMessage = Util.statusCodeToText.get(Util.STATUS_INTERNAL_SERVER_ERROR);
         builder.append(statusMessage).append(Util.CRLF_STRING);
 
-        for (Field header: responseMessage.headers) {
-            builder.append(header.name).append((char)Util.COLON);
-            Iterator<String> iterator = header.values.iterator();
+        for (Map.Entry<String, ArrayList<String>> header: responseMessage.headers.entrySet()) {
+            builder.append(header.getKey()).append((char)Util.COLON);
+            Iterator<String> iterator = header.getValue().iterator();
             while(iterator.hasNext()) {
                 builder.append(iterator.next());
                 if(iterator.hasNext()) builder.append((char)Util.COMMA);
@@ -60,7 +59,7 @@ public class ResponseCodec {
     public ResponseMessage badRequest() {
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.statusCode = Util.STATUS_BAD_REQUEST;
-        responseMessage.headers.add(contentLengthZeroHeader);
+        responseMessage.headers.put(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthZero);
         return responseMessage;
     }
 }

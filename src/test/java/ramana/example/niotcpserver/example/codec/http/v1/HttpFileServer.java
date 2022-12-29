@@ -4,7 +4,6 @@ import ramana.example.niotcpserver.Bootstrap;
 import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.http.handler.v1.CodecChannelHandler;
 import ramana.example.niotcpserver.codec.http.handler.v1.ProcessorChannelHandler;
-import ramana.example.niotcpserver.codec.http.request.Field;
 import ramana.example.niotcpserver.codec.http.request.v1.RequestMessage;
 import ramana.example.niotcpserver.codec.http.response.ResponseMessage;
 import ramana.example.niotcpserver.codec.http.v1.Processor;
@@ -14,7 +13,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,17 +40,17 @@ public class HttpFileServer {
     }
 
     public static class FileServer implements Processor {
-        private static final List<Field> allowedMethodsResponseHeaders = new ArrayList<>(2);
+        private static final Map<String, ArrayList<String>> allowedMethodsResponseHeaders = new HashMap<>();
         private static final ArrayList<String> allowedMethodsValues = new ArrayList<>();
         private static final ArrayList<String> contentLengthValues = new ArrayList<>(1);
-        private static final Field contentLengthHeader = new Field(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthValues);
+
         static {
             allowedMethodsValues.add("GET");
             allowedMethodsValues.add("HEAD");
             allowedMethodsValues.add("OPTIONS");
-            allowedMethodsResponseHeaders.add(new Field("Allow", allowedMethodsValues));
+            allowedMethodsResponseHeaders.put("Allow", allowedMethodsValues);
             contentLengthValues.add(String.valueOf(0));
-            allowedMethodsResponseHeaders.add(contentLengthHeader);
+            allowedMethodsResponseHeaders.put(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthValues);
         }
         @Override
         public void process(RequestMessage requestMessage, ResponseMessage responseMessage) {
@@ -67,7 +67,7 @@ public class HttpFileServer {
                     break;
                 default:
                     responseMessage.statusCode = Util.STATUS_NOT_IMPLEMENTED;
-                    responseMessage.headers.add(contentLengthHeader);
+                    responseMessage.headers.put(Util.REQ_HEADER_CONTENT_LENGTH, contentLengthValues);
             }
         }
 
@@ -104,7 +104,7 @@ public class HttpFileServer {
             ArrayList<String> values = new ArrayList<>();
             responseMessage.body = content;
             values.add(String.valueOf(content.length));
-            responseMessage.headers.add(new Field(Util.REQ_HEADER_CONTENT_LENGTH, values));
+            responseMessage.headers.put(Util.REQ_HEADER_CONTENT_LENGTH, values);
         }
     }
 }

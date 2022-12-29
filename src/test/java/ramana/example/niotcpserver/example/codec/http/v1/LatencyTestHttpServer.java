@@ -3,11 +3,10 @@ package ramana.example.niotcpserver.example.codec.http.v1;
 import ramana.example.niotcpserver.Bootstrap;
 import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.http.handler.v1.CodecChannelHandler;
-import ramana.example.niotcpserver.codec.http.v1.Processor;
 import ramana.example.niotcpserver.codec.http.handler.v1.ProcessorChannelHandler;
-import ramana.example.niotcpserver.codec.http.request.Field;
 import ramana.example.niotcpserver.codec.http.request.v1.RequestMessage;
 import ramana.example.niotcpserver.codec.http.response.ResponseMessage;
+import ramana.example.niotcpserver.codec.http.v1.Processor;
 
 import java.util.ArrayList;
 
@@ -37,13 +36,12 @@ public class LatencyTestHttpServer {
         static {
             values.add(String.valueOf(message.length));
         }
-        private static final Field contentLengthHeader = new Field(Util.REQ_HEADER_CONTENT_LENGTH, values);
 
         @Override
         public void process(RequestMessage requestMessage, ResponseMessage responseMessage) {
             responseMessage.statusCode = Util.STATUS_OK;
             responseMessage.body = message;
-            responseMessage.headers.add(contentLengthHeader);
+            responseMessage.headers.put(Util.REQ_HEADER_CONTENT_LENGTH, values);
         }
     }
 }

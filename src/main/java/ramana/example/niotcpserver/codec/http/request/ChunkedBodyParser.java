@@ -5,13 +5,14 @@ import ramana.example.niotcpserver.codec.parser.CompositeParser;
 import ramana.example.niotcpserver.codec.parser.OneOrMore;
 import ramana.example.niotcpserver.codec.parser.ZeroOrMore;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ChunkedBodyParser extends CompositeParser<byte[]> {
-    private final List<Field> headers;
+    Map<String, ArrayList<String>> headers;
 
-    public ChunkedBodyParser(List<Field> headers) {
+    public ChunkedBodyParser(Map<String, ArrayList<String>> headers) {
         this.headers = headers;
         parsers.add(new OneOrMore<>(new ChunkParser()));
         parsers.add(new ZeroOrMore<>(new FieldLineParser()));
@@ -21,19 +22,10 @@ public class ChunkedBodyParser extends CompositeParser<byte[]> {
     @Override
     protected byte[] composeResult() {
         List<Field> trailers = (List<Field>) parsers.get(1).getResult();
-        if(trailers.size() > 0) {
-            HashMap<String, Field> hashMap = new HashMap<>(Math.max(headers.size(), trailers.size()) * 2);
-            for (Field field: trailers) {
-                hashMap.put(field.name, field);
-            }
-            for (Field field: headers) {
-                hashMap.put(field.name, field);
-            }
-            headers.clear();
-            headers.addAll(hashMap.values());
+        for (Field trailer: trailers) {
+            if(!headers.containsKey(trailer.name)) headers.put(trailer.name, trailer.values);
         }
-        headers.stream().filter(field -> Util.REQ_HEADER_TRANSFER_ENCODING.equals(field.name))
-                .forEach(field -> field.values.remove(Util.REQ_HEADER_TRANSFER_ENCODING_CHUNKED));
+        headers.get(Util.REQ_HEADER_TRANSFER_ENCODING).remove(Util.REQ_HEADER_TRANSFER_ENCODING_CHUNKED);
 
         int tmp = 0;
         List<byte[]> list = (List<byte[]>) parsers.get(0).getResult();

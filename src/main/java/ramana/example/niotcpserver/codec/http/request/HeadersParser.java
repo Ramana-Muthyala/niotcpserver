@@ -7,10 +7,11 @@ import ramana.example.niotcpserver.types.InternalException;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public class HeadersParser extends ZeroOrMore<Field, FieldLineParser> {
     private final RequestParser requestParser;
+    Map<String, ArrayList<String>> headers;
 
     public HeadersParser(FieldLineParser parser, RequestParser requestParser) {
         super(parser);
@@ -27,33 +28,28 @@ public class HeadersParser extends ZeroOrMore<Field, FieldLineParser> {
         }
 
         if(status == Status.DONE) {
-            AbstractParser bodyParser = checkBodyProcessorHeaders(result);
+            headers = Util.toMap(result);
+            AbstractParser bodyParser = checkBodyProcessorHeaders();
             if(bodyParser != null) requestParser.add(bodyParser);
             if(pushBackSignal != null) throw pushBackSignal;
         }
     }
 
-    private AbstractParser checkBodyProcessorHeaders(List<Field> headers) throws ParseException {
-        Integer contentLength = null;
-        ArrayList<String> transferEncoding = null;
-        for (Field header: headers) {
-            if(Util.REQ_HEADER_CONTENT_LENGTH.equals(header.name)) {
-                try {
-                    contentLength = Integer.parseInt(header.values.get(0));
-                } catch (IndexOutOfBoundsException | NumberFormatException exception) {
-                    throw new ParseException(exception);
-                }
-            } else if(Util.REQ_HEADER_TRANSFER_ENCODING.equals(header.name)) {
-                transferEncoding = header.values;
-            }
-            if(contentLength != null  &&  transferEncoding != null) throw new ParseException();
-        }
+    private AbstractParser checkBodyProcessorHeaders() throws ParseException {
+        ArrayList<String> contentLength = headers.get(Util.REQ_HEADER_CONTENT_LENGTH);
+        ArrayList<String> transferEncoding = headers.get(Util.REQ_HEADER_TRANSFER_ENCODING);
+        if(contentLength != null  &&  transferEncoding != null) throw new ParseException();
         if(transferEncoding != null  &&  transferEncoding.contains(Util.REQ_HEADER_TRANSFER_ENCODING_CHUNKED)) {
-            return new ChunkedBodyParser(result);
+            return new ChunkedBodyParser(headers);
         }
         if(contentLength != null) {
-            if(contentLength < 0) throw new ParseException();
-            if(contentLength > 0) return new FixedLengthParser(contentLength);
+            try {
+                int contentLengthInt = Integer.parseInt(contentLength.get(0));
+                if(contentLengthInt < 0) throw new ParseException();
+                if(contentLengthInt > 0) return new FixedLengthParser(contentLengthInt);
+            } catch (IndexOutOfBoundsException | NumberFormatException exception) {
+                throw new ParseException(exception);
+            }
         }
         return null;
     }

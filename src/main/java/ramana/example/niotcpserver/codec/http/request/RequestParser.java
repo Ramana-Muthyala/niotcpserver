@@ -3,8 +3,6 @@ package ramana.example.niotcpserver.codec.http.request;
 import ramana.example.niotcpserver.codec.http.Util;
 import ramana.example.niotcpserver.codec.parser.CompositeParser;
 
-import java.util.List;
-
 public class RequestParser extends CompositeParser<RequestMessage> {
     public RequestParser() {
         parsers.add(new RequestLineParser());
@@ -15,6 +13,6 @@ public class RequestParser extends CompositeParser<RequestMessage> {
     @Override
     protected RequestMessage composeResult() {
         byte[] body = (this.parsers.size() == 4) ? (byte[]) parsers.get(3).getResult() : null;
-        return new RequestMessage((RequestLine)parsers.get(0).getResult(), (List<Field>)parsers.get(1).getResult(), body);
+        return new RequestMessage((RequestLine)parsers.get(0).getResult(), ((HeadersParser)parsers.get(1)).headers, body);
     }
 }
