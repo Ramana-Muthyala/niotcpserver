@@ -5,7 +5,6 @@ import ramana.example.niotcpserver.Client;
 import ramana.example.niotcpserver.handler.Context;
 import ramana.example.niotcpserver.handler.impl.ChannelHandlerAdapter;
 import ramana.example.niotcpserver.types.InternalException;
-import ramana.example.niotcpserver.util.CompletionSignal;
 
 public class TcpMonitorServer {
 
@@ -25,15 +24,11 @@ public class TcpMonitorServer {
         public void onConnect(Context.OnConnect context, Object data) throws InternalException {
             this.context = context;
             clientChannelHandler = new ClientChannelHandler(this);
-            try {
-                new Client().connect("localhost", 8081)
-                        .enableDefaultRead()
-                        .enableLogging()
-                        .channelHandler(clientChannelHandler)
-                        .startAndWaitForOnConnectSignal();
-            } catch (CompletionSignal.CompletionSignalException | InterruptedException exception) {
-                throw new RuntimeException(exception);
-            }
+            new Client().connect("localhost", 8081)
+                    .enableDefaultRead()
+                    .enableLogging()
+                    .channelHandler(clientChannelHandler)
+                    .startAndWaitForOnConnectSignal();
         }
 
         @Override

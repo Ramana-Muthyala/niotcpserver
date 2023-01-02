@@ -75,21 +75,39 @@ public class Client {
     public void run() {
         validate();
         SelectorProvider provider = SelectorProvider.provider();
-        new ClientWorker(this, null, null, provider).run();
+        try {
+            CompletionSignal initSignal = new CompletionSignal(1);
+            new ClientWorker(this, initSignal, null, provider).run();
+            initSignal.doWait();
+        } catch (CompletionSignal.CompletionSignalException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void start() {
         validate();
         SelectorProvider provider = SelectorProvider.provider();
-        new Thread(new ClientWorker(this, null, null, provider)).start();
+        CompletionSignal initSignal;
+        try {
+            initSignal = new CompletionSignal(1);
+            new Thread(new ClientWorker(this, initSignal, null, provider)).start();
+            initSignal.doWait();
+        } catch (CompletionSignal.CompletionSignalException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void startAndWaitForOnConnectSignal() throws CompletionSignal.CompletionSignalException, InterruptedException {
+    public void startAndWaitForOnConnectSignal() {
         validate();
         SelectorProvider provider = SelectorProvider.provider();
-        CompletionSignal onConnectSignal = new CompletionSignal(1);
-        new Thread(new ClientWorker(this, null, onConnectSignal, provider)).start();
-        onConnectSignal.doWait();
+        CompletionSignal onConnectSignal;
+        try {
+            onConnectSignal = new CompletionSignal(1);
+            new Thread(new ClientWorker(this, null, onConnectSignal, provider)).start();
+            onConnectSignal.doWait();
+        } catch (CompletionSignal.CompletionSignalException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Client enableLogging() {
