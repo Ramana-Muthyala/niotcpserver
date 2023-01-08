@@ -23,6 +23,7 @@ public class Bootstrap {
     private boolean defaultRead;
     private int backlog;
     private boolean loggingEnabled;
+    private boolean sslEnabled;
 
     public int getBacklog() {
         return backlog;
@@ -129,5 +130,14 @@ public class Bootstrap {
     public Bootstrap enableLogging() {
         loggingEnabled = true;
         return this;
+    }
+
+    public Bootstrap enableSsl() {
+        sslEnabled = true;
+        return this;
+    }
+
+    public boolean isSslEnabled() {
+        return sslEnabled;
     }
 }

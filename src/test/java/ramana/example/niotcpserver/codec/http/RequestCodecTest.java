@@ -19,7 +19,7 @@ public class RequestCodecTest {
     private static final Logger logger = LogFactory.getLogger();
     @Test
     void testOne() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testSimpleRequest(allocator, requestCodec);
     }
@@ -50,7 +50,7 @@ public class RequestCodecTest {
 
     @Test
     void testTwo() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testHeadersRequest(allocator, requestCodec);
     }
@@ -86,7 +86,7 @@ public class RequestCodecTest {
 
     @Test
     void testThree() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testBodyRequest(allocator, requestCodec);
     }
@@ -134,7 +134,7 @@ public class RequestCodecTest {
 
     @Test
     void testFour() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testSimpleRequest(allocator, requestCodec);
         testHeadersRequest(allocator, requestCodec);
@@ -143,7 +143,7 @@ public class RequestCodecTest {
 
     @Test
     void testFive() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testSimpleRequest(allocator, requestCodec);
         ParseException exception = null;

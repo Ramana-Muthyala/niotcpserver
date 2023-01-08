@@ -24,6 +24,9 @@ Http codec: Minimalistic and lenient implementation is given for demonstration p
                 Not all status codes are implemented. Most of the use cases are covered.
                 For status codes, refer: src/main/java/ramana/example/niotcpserver/codec/http/Util.java
 
+SSL notes: If self-signed certificate expires, it has to be regenerated.
+    Keystore path: src/main/resources/keyStore.jks
+
 For examples and test cases:
     Refer test folder: src/test/java
     Few samples to start with:
@@ -31,4 +34,6 @@ For examples and test cases:
         2. Http codec:
                 src/test/java/ramana/example/niotcpserver/example/codec/http
                 src/test/java/ramana/example/niotcpserver/example/codec/http/v1
+                src/test/java/ramana/example/niotcpserver/example/codec/http/v1/ssl
+
 

@@ -7,6 +7,8 @@ public interface Constants {
     int DEFAULT_NUM_WORKERS = Runtime.getRuntime().availableProcessors() * 2;
     long SERVER_SHUTDOWN_TIMEOUT = 20000; // milliseconds
     long CHANNEL_CLOSE_TIMEOUT = 5000; // milliseconds
+    long SSL_CHANNEL_CLOSE_TIMEOUT = 10000; // milliseconds
+
     int READ_BUFFER_CAPACITY = 1 << 12;
     int CACHE_NORMAL_CAPACITY = 1 << 16;
     int CACHE_SMALL_SIZE = 256;

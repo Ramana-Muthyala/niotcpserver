@@ -4,9 +4,11 @@ import ramana.example.niotcpserver.Client;
 import ramana.example.niotcpserver.handler.ChannelHandler;
 import ramana.example.niotcpserver.handler.impl.LoggingHandler;
 import ramana.example.niotcpserver.io.ClientAllocator;
+import ramana.example.niotcpserver.io.SslMode;
 import ramana.example.niotcpserver.types.LinkedList;
 import ramana.example.niotcpserver.types.SocketOptionException;
 import ramana.example.niotcpserver.util.CompletionSignal;
+import ramana.example.niotcpserver.util.SslContextUtil;
 import ramana.example.niotcpserver.util.Util;
 import ramana.example.niotcpserver.worker.impl.ContextFactory;
 import ramana.example.niotcpserver.worker.impl.InternalChannelHandler;
@@ -14,21 +16,29 @@ import ramana.example.niotcpserver.worker.impl.InternalChannelHandler;
 import java.io.IOError;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 public class ClientWorker extends AbstractWorker {
     private final Client client;
     private final CompletionSignal onConnectSignal;
     private SocketChannel channel;
-    private final ClientAllocator allocator = new ClientAllocator();
+    private final ClientAllocator allocator;
+    private ClientAllocator directAllocator;
 
     public ClientWorker(Client client, CompletionSignal initSignal, CompletionSignal onConnectSignal, SelectorProvider provider) {
         super(initSignal, provider, client.getSocketOptions(), client.isLoggingEnabled());
         this.onConnectSignal = onConnectSignal;
         this.client = client;
+        Function<Integer, ByteBuffer> allocatorFunction = (client.isSslEnabled() || client.isSslEnabledWithDefaultTrustManager()) ? ByteBuffer::allocate : ByteBuffer::allocateDirect;
+        allocator = new ClientAllocator(allocatorFunction);
+        if(client.isSslEnabled() || client.isSslEnabledWithDefaultTrustManager()) {
+            directAllocator = new ClientAllocator(ByteBuffer::allocateDirect);
+        }
     }
 
     @Override
@@ -38,15 +48,19 @@ public class ClientWorker extends AbstractWorker {
             if(sk.isConnectable()) {
                 channel.finishConnect();
                 sk.interestOps(sk.interestOps() & (~SelectionKey.OP_CONNECT));
-                internalChannelHandler.onConnect(sk);
+                SslMode sslMode = client.isSslEnabled() ? SslMode.CLIENT :
+                        (client.isSslEnabledWithDefaultTrustManager()
+                                ? SslMode.CLIENT_DEFAULT_TM : SslMode.NONE);
+                internalChannelHandler.onConnect(sk, sslMode, directAllocator);
                 if(onConnectSignal != null) onConnectSignal.complete();
                 if(!channel.isOpen()) doWork = false;
                 return;
             }
             allocator.recycle(); // free memory
+            if(directAllocator != null) directAllocator.recycle();
             if(sk.isReadable()) internalChannelHandler.handleRead();
             if(sk.isValid() && sk.isWritable()) internalChannelHandler.handleWrite();
-        } catch (OutOfMemoryError | IOError | IOException | RuntimeException exception) {
+        } catch (OutOfMemoryError | IOError | IOException | RuntimeException | SslContextUtil.SSLContextException exception) {
             doWork = false;
             logger.log(Level.WARNING, exception.getMessage(), exception);
             close(channel);

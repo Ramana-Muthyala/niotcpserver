@@ -17,6 +17,8 @@ public class Client {
     private boolean defaultRead;
     private final List<ChannelHandler> channelHandlers = new ArrayList<>();
     private boolean loggingEnabled;
+    private boolean sslEnabled;
+    private boolean sslEnabledWithDefaultTrustManager;
 
     public boolean isLoggingEnabled() {
         return loggingEnabled;
@@ -113,5 +115,23 @@ public class Client {
     public Client enableLogging() {
         loggingEnabled = true;
         return this;
+    }
+
+    public Client enableSsl() {
+        sslEnabled = true;
+        return this;
+    }
+
+    public boolean isSslEnabled() {
+        return sslEnabled;
+    }
+
+    public Client enableSslWithDefaultTrustManager() {
+        sslEnabledWithDefaultTrustManager = true;
+        return this;
+    }
+
+    public boolean isSslEnabledWithDefaultTrustManager() {
+        return sslEnabledWithDefaultTrustManager;
     }
 }

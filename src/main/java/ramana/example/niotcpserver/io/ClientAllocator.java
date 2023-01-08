@@ -2,11 +2,19 @@ package ramana.example.niotcpserver.io;
 
 import ramana.example.niotcpserver.util.Constants;
 
+import java.nio.ByteBuffer;
+import java.util.function.Function;
+
 public class ClientAllocator extends DefaultAllocator {
     {
         sizes = new Sizes();
     }
-    private static class Sizes implements ISizes {
+
+    public ClientAllocator(Function<Integer, ByteBuffer> allocatorFunction) {
+        super(allocatorFunction);
+    }
+
+    private class Sizes implements ISizes {
         private static final int smallCapacity = Constants.READ_BUFFER_CAPACITY;
         private static final int normalCapacity = Constants.CACHE_NORMAL_CAPACITY;
         private static final int smallSize = Constants.CACHE_CLIENT_SMALL_SIZE;
@@ -22,8 +30,8 @@ public class ClientAllocator extends DefaultAllocator {
         @Override
         public DefaultAllocator.Cache[] buildCaches(DefaultAllocator allocator) {
             DefaultAllocator.Cache[] caches = new DefaultAllocator.Cache[2];
-            caches[0] = new DefaultAllocator.Cache(allocator, smallSize, smallCapacity);
-            caches[1] = new DefaultAllocator.Cache(allocator, normalSize, normalCapacity);
+            caches[0] = new Cache(allocator, smallSize, smallCapacity);
+            caches[1] = new Cache(allocator, normalSize, normalCapacity);
             return caches;
         }
     }

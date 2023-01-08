@@ -57,6 +57,7 @@ public class Configuration {
     public static class WorkerConfiguration extends Configuration {
         private final int idleTimeout;
         private final boolean defaultRead;
+        private final boolean sslEnabled;
 
         public List<Class<? extends ChannelHandler>> getChannelHandlers() {
             return channelHandlers;
@@ -71,11 +72,16 @@ public class Configuration {
             return idleTimeout;
         }
 
-        public WorkerConfiguration(SelectorProvider selectorProvider, Pair<SocketOption, Object>[] socketOptions, List<Class<? extends ChannelHandler>> channelHandlers, int idleTimeout, boolean defaultRead, boolean loggingEnabled) {
+        public boolean isSslEnabled() {
+            return sslEnabled;
+        }
+
+        public WorkerConfiguration(SelectorProvider selectorProvider, Pair<SocketOption, Object>[] socketOptions, List<Class<? extends ChannelHandler>> channelHandlers, int idleTimeout, boolean defaultRead, boolean loggingEnabled, boolean sslEnabled) {
             super(selectorProvider, socketOptions, loggingEnabled);
             this.channelHandlers = channelHandlers;
             this.idleTimeout = idleTimeout;
             this.defaultRead = defaultRead;
+            this.sslEnabled = sslEnabled;
         }
     }
 }

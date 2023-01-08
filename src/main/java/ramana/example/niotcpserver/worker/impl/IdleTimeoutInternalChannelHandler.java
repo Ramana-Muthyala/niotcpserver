@@ -1,10 +1,15 @@
 package ramana.example.niotcpserver.worker.impl;
 
 import ramana.example.niotcpserver.handler.ChannelHandler;
+import ramana.example.niotcpserver.io.Allocator;
+import ramana.example.niotcpserver.io.SslMode;
 import ramana.example.niotcpserver.types.InternalException;
 import ramana.example.niotcpserver.types.LinkedList;
+import ramana.example.niotcpserver.util.SslContextUtil;
 import ramana.example.niotcpserver.worker.Worker;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 
 public class IdleTimeoutInternalChannelHandler extends InternalChannelHandler {
@@ -48,8 +53,8 @@ public class IdleTimeoutInternalChannelHandler extends InternalChannelHandler {
     }
 
     @Override
-    public void onConnect(SelectionKey sk) {
-        super.onConnect(sk);
+    public void onConnect(SelectionKey sk, SslMode sslMode, Allocator<ByteBuffer> directAllocator) throws SslContextUtil.SSLContextException, IOException {
+        super.onConnect(sk, sslMode, directAllocator);
         scheduleIdleTimeoutTask();
     }
 

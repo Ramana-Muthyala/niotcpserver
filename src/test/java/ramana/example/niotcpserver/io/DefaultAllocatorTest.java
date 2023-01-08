@@ -18,7 +18,7 @@ public class DefaultAllocatorTest {
     private static final Logger logger = LogFactory.getLogger();
     @Test
     void testAllocation() throws NoSuchFieldException, IllegalAccessException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         DefaultAllocator.Cache[] caches = (DefaultAllocator.Cache[]) TestUtil.invoke(allocator, "caches");
 
         Allocator.Resource<ByteBuffer> resource = allocator.allocate(Constants.READ_BUFFER_CAPACITY);
@@ -52,7 +52,7 @@ public class DefaultAllocatorTest {
 
     @Test
     void testAllocatorGCOne() throws NoSuchFieldException, IllegalAccessException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         LinkedList referenceList = (LinkedList) TestUtil.invoke(allocator, "referenceList");
         ReferenceQueue referenceQueue = (ReferenceQueue) TestUtil.invoke(allocator, "referenceQueue");
         DefaultAllocator.Cache[] caches = (DefaultAllocator.Cache[]) TestUtil.invoke(allocator, "caches");
@@ -90,7 +90,7 @@ public class DefaultAllocatorTest {
 
     @Test
     void testAllocatorGCTwo() throws NoSuchFieldException, IllegalAccessException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         LinkedList referenceList = (LinkedList) TestUtil.invoke(allocator, "referenceList");
         ReferenceQueue referenceQueue = (ReferenceQueue) TestUtil.invoke(allocator, "referenceQueue");
         DefaultAllocator.Cache[] caches = (DefaultAllocator.Cache[]) TestUtil.invoke(allocator, "caches");
@@ -117,7 +117,7 @@ public class DefaultAllocatorTest {
 
     @Test
     void testAllocatorGCThree() throws NoSuchFieldException, IllegalAccessException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         LinkedList referenceList = (LinkedList) TestUtil.invoke(allocator, "referenceList");
         ReferenceQueue referenceQueue = (ReferenceQueue) TestUtil.invoke(allocator, "referenceQueue");
         DefaultAllocator.Cache[] caches = (DefaultAllocator.Cache[]) TestUtil.invoke(allocator, "caches");

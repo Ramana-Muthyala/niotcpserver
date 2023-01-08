@@ -32,7 +32,7 @@ public class Server {
         SelectorProvider provider = SelectorProvider.provider();
         Dispatcher dispatcher = new Dispatcher();
         Configuration.ServerConfiguration serverConfiguration = new Configuration.ServerConfiguration(provider, bootstrap.getServerSocketOptions(), bootstrap.getPort(), dispatcher, bootstrap.getBacklog());
-        Configuration.WorkerConfiguration workerConfiguration = new Configuration.WorkerConfiguration(provider, bootstrap.getSocketOptions(), bootstrap.getChannelHandlers(), bootstrap.getIdleTimeout(), bootstrap.isDefaultRead(), bootstrap.isLoggingEnabled());
+        Configuration.WorkerConfiguration workerConfiguration = new Configuration.WorkerConfiguration(provider, bootstrap.getSocketOptions(), bootstrap.getChannelHandlers(), bootstrap.getIdleTimeout(), bootstrap.isDefaultRead(), bootstrap.isLoggingEnabled(), bootstrap.isSslEnabled());
         numWorkers = bootstrap.getNumWorkers();
         workers = new Worker[numWorkers];
         dispatcher.setWorkers(workers);

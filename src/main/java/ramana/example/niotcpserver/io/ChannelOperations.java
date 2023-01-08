@@ -15,13 +15,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ChannelOperations {
-    private static final Logger logger = LogFactory.getLogger();
+    protected static final Logger logger = LogFactory.getLogger();
     public final SelectionKey selectionKey;
     public final SocketChannel channel;
-    private final Allocator<ByteBuffer> allocator;
-    private final Queue<Allocator.Resource<ByteBuffer>> outboundQueue = new LinkedList<>();
-    private long closeTicker;
-    private static final long closeTimeout = Constants.CHANNEL_CLOSE_TIMEOUT;
+    protected final Allocator<ByteBuffer> allocator;
+    protected final Queue<Allocator.Resource<ByteBuffer>> outboundQueue = new LinkedList<>();
+    protected long closeTicker;
+    protected static long closeTimeout = Constants.CHANNEL_CLOSE_TIMEOUT;
 
     public ChannelOperations(Allocator<ByteBuffer> allocator, SelectionKey sk) {
         this.allocator = allocator;
@@ -82,19 +82,19 @@ public class ChannelOperations {
         if(closeTicker > 0) close(false);
     }
 
-    private void releaseResources() {
+    protected void releaseResources() {
         Allocator.Resource<ByteBuffer> resource;
         while ((resource = outboundQueue.poll()) != null) {
             resource.release();
         }
     }
 
-    private void setWriteInterest() {
+    protected void setWriteInterest() {
         if((selectionKey.interestOps() & SelectionKey.OP_WRITE) == Constants.SELECTION_KEY_OP_NONE)
             selectionKey.interestOps(selectionKey.interestOps() | SelectionKey.OP_WRITE);
     }
 
-    private void clearWriteInterest() {
+    protected void clearWriteInterest() {
         if((selectionKey.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE)
             selectionKey.interestOps(selectionKey.interestOps() & (~SelectionKey.OP_WRITE));
     }

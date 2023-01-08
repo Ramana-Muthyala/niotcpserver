@@ -20,7 +20,7 @@ public class BufferTest {
 
     @Test
     void testRead() throws InternalException, NoSuchFieldException, IllegalAccessException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         Buffer buffer = new Buffer();
         for (int i = 0; i < 5; i++) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -45,7 +45,7 @@ public class BufferTest {
 
     @Test
     void testMark() throws InternalException, NoSuchFieldException, IllegalAccessException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         Buffer buffer = new Buffer();
         mark0(allocator, buffer);
     }
@@ -117,7 +117,7 @@ public class BufferTest {
 
     @Test
     void testMarkReset() throws InternalException, NoSuchFieldException, IllegalAccessException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         Buffer buffer = new Buffer();
 
         mark0(allocator, buffer);
@@ -126,7 +126,7 @@ public class BufferTest {
 
     @Test
     void testMarkResetRelease() throws NoSuchFieldException, InternalException, IllegalAccessException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         Buffer buffer = new Buffer();
 
         mark0(allocator, buffer);

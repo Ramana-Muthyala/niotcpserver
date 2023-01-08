@@ -21,7 +21,7 @@ public class ChunkedRequestTest {
 
     @Test
     void testOne() throws InternalException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         ParseException exception = null;
         try {
@@ -69,7 +69,7 @@ public class ChunkedRequestTest {
 
     @Test
     void testTwo() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testChunkedBodyRequest(allocator, requestCodec);
     }
@@ -121,7 +121,7 @@ public class ChunkedRequestTest {
 
     @Test
     void testThree() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testChunkedBodyRequest(allocator, requestCodec);
         testChunkedBodyWithChunkExtensionsRequest(allocator, requestCodec);

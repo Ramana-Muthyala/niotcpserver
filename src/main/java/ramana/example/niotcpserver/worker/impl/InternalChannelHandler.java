@@ -3,10 +3,13 @@ package ramana.example.niotcpserver.worker.impl;
 import ramana.example.niotcpserver.handler.ChannelHandler;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.io.ChannelOperations;
+import ramana.example.niotcpserver.io.SslChannelOperations;
+import ramana.example.niotcpserver.io.SslMode;
 import ramana.example.niotcpserver.log.LogFactory;
 import ramana.example.niotcpserver.types.ChannelHandlerMethodName;
 import ramana.example.niotcpserver.types.InternalException;
 import ramana.example.niotcpserver.types.LinkedList;
+import ramana.example.niotcpserver.util.SslContextUtil;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -70,19 +73,33 @@ public class InternalChannelHandler {
         }
     }
 
-    public void onConnect(SelectionKey sk) {
+    public void onConnect(SelectionKey sk, SslMode sslMode, Allocator<ByteBuffer> directAllocator) throws SslContextUtil.SSLContextException, IOException {
         SocketChannel channel = (SocketChannel) sk.channel();
-        channelOperations = new ChannelOperations(allocator, sk);
-        LinkedList.LinkedNode<ChannelHandler> channelHandlerNode = channelHandlers.head;
-        DefaultContext context = factory.newContext(this, channelHandlerNode, ChannelHandlerMethodName.onConnect);
-        try {
-            this.socketAddress = "[" + channel.getLocalAddress().toString() + " - " + channel.getRemoteAddress().toString() + "]";
-            channelHandlerNode.value.onConnect(context, null);
-        } catch (OutOfMemoryError | IOError | RuntimeException | InternalException | IOException exception) {
-            if(context.invalidated) return;
-            context.cause = exception;
-            onClose(context);
+        channelOperations  =  sslMode == SslMode.NONE
+                ? new ChannelOperations(allocator, sk)
+                    : new SslChannelOperations(allocator, directAllocator, sk, sslMode);
+
+        Runnable onConnect = () -> {
+            LinkedList.LinkedNode<ChannelHandler> channelHandlerNode = channelHandlers.head;
+            DefaultContext context = factory.newContext(this, channelHandlerNode, ChannelHandlerMethodName.onConnect);
+            try {
+                this.socketAddress = "[" + channel.getLocalAddress().toString() + " - " + channel.getRemoteAddress().toString() + "]";
+                channelHandlerNode.value.onConnect(context, null);
+            } catch (OutOfMemoryError | IOError | RuntimeException | InternalException | IOException exception) {
+                if(context.invalidated) return;
+                context.cause = exception;
+                onClose(context);
+            }
+        };
+
+        if(sslMode == SslMode.NONE) {
+            onConnect.run();
+            return;
         }
+
+        SslChannelOperations sslChannelOperations = (SslChannelOperations) channelOperations;
+        if(sslMode != SslMode.SERVER) sslChannelOperations.beginHandShake();
+        sslChannelOperations.onConnect(onConnect);
     }
 
     private void onClose(DefaultContext context) {

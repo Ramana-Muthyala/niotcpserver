@@ -21,35 +21,35 @@ public class RequestCodecTest {
 
     @Test
     void testOne() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testSimpleRequest(allocator, requestCodec);
     }
 
     @Test
     void testTwo() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testAsteriskFormRequest(allocator, requestCodec);
     }
 
     @Test
     void testThree() throws InternalException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testAuthorityFormRequest(allocator, requestCodec);
     }
 
     @Test
     void testFour() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testAbsoluteFormRequest(allocator, requestCodec);
     }
 
     @Test
     void testFive() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
         testSimpleRequest(allocator, requestCodec);
         testAsteriskFormRequest(allocator, requestCodec);
@@ -60,7 +60,7 @@ public class RequestCodecTest {
 
     @Test
     void testHeadersOne() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
 
         String request = "GET /index.html?name=ramana HTTP/1.1\r\n" +
@@ -93,7 +93,7 @@ public class RequestCodecTest {
 
     @Test
     void testBody() throws InternalException, ParseException {
-        DefaultAllocator allocator = new DefaultAllocator();
+        DefaultAllocator allocator = new DefaultAllocator(ByteBuffer::allocate);
         RequestCodec requestCodec = new RequestCodec();
 
         String body = "Hey, This is a POST message !!";

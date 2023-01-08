@@ -9,18 +9,24 @@ import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.function.Function;
 
 public class DefaultAllocator implements AllocatorInternal<ByteBuffer> {
+    private final Function<Integer, ByteBuffer> allocatorFunction;
     protected ISizes sizes = new Sizes();
     private final Cache[] caches = sizes.buildCaches(this);
     private final LinkedList<AllocatorReference> referenceList = new LinkedList<>();
     private final ReferenceQueue<CachedResource> referenceQueue = new ReferenceQueue<>();
 
+    public DefaultAllocator(Function<Integer, ByteBuffer> allocatorFunction) {
+        this.allocatorFunction = allocatorFunction;
+    }
+
     protected interface ISizes {
         DefaultAllocator.Cache cacheFor(DefaultAllocator.Cache[] caches, int capacity);
         DefaultAllocator.Cache[] buildCaches(DefaultAllocator allocator);
     }
-    private static class Sizes implements ISizes {
+    private class Sizes implements ISizes {
         private static final int smallCapacity = Constants.READ_BUFFER_CAPACITY;
         private static final int normalCapacity = Constants.CACHE_NORMAL_CAPACITY;
         private static final int smallSize = Constants.CACHE_SMALL_SIZE;
@@ -36,8 +42,8 @@ public class DefaultAllocator implements AllocatorInternal<ByteBuffer> {
         @Override
         public DefaultAllocator.Cache[] buildCaches(DefaultAllocator allocator) {
             DefaultAllocator.Cache[] caches = new DefaultAllocator.Cache[2];
-            caches[0] = new DefaultAllocator.Cache(allocator, smallSize, smallCapacity);
-            caches[1] = new DefaultAllocator.Cache(allocator, normalSize, normalCapacity);
+            caches[0] = new Cache(allocator, smallSize, smallCapacity);
+            caches[1] = new Cache(allocator, normalSize, normalCapacity);
             return caches;
         }
     }
@@ -74,7 +80,7 @@ public class DefaultAllocator implements AllocatorInternal<ByteBuffer> {
         }
     }
 
-    protected static class Cache {
+    protected class Cache {
         private final int capacity;
         private final Queue<CachedResource> queue;
         private final DefaultAllocator allocator;
@@ -94,12 +100,12 @@ public class DefaultAllocator implements AllocatorInternal<ByteBuffer> {
         }
     }
 
-    private static class UnCachedResource implements Allocator.Resource<ByteBuffer> {
+    private class UnCachedResource implements Allocator.Resource<ByteBuffer> {
         protected final ByteBuffer byteBuffer;
         protected boolean released;
 
         private UnCachedResource(int capacity) {
-            byteBuffer = ByteBuffer.allocateDirect(capacity);
+            byteBuffer = allocatorFunction.apply(capacity);
         }
 
         private UnCachedResource(ByteBuffer byteBuffer) {
@@ -123,7 +129,7 @@ public class DefaultAllocator implements AllocatorInternal<ByteBuffer> {
         }
     }
 
-    private static class CachedResource extends UnCachedResource {
+    private class CachedResource extends UnCachedResource {
         private final Cache cache;
         private final LinkedList.LinkedNode<AllocatorReference> referenceNode;
 
