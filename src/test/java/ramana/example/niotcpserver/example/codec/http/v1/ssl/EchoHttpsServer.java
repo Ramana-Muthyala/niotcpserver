@@ -20,6 +20,7 @@ public class EchoHttpsServer {
                 .enableDefaultRead()
                 .enableLogging()
                 .enableSsl()
+                .idleTimeout(10)
                 .numOfWorkers(4)
                 .channelHandler(CodecChannelHandler.class)
                 .channelHandler(ChannelHandler.class)
