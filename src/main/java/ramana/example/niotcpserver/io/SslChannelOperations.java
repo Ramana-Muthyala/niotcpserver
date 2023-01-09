@@ -157,7 +157,6 @@ public class SslChannelOperations extends ChannelOperations {
                 onConnectInvoked = true;
                 onConnect.run();
             }
-            pendingTask = null;
         }
 
         private void wrap() throws IOException, InternalException {
