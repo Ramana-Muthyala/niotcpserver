@@ -46,6 +46,7 @@ public class SslChannelOperations extends ChannelOperations {
         while(destinationBuffer.hasRemaining()) {
             int bytesWritten = channel.write(destinationBuffer);
             if(bytesWritten == 0) {
+                destinationBuffer.compact();
                 setWriteInterest();
                 return false;
             }
@@ -75,6 +76,11 @@ public class SslChannelOperations extends ChannelOperations {
             }
             Allocator.Resource<ByteBuffer> resource;
             while ((resource = outboundQueue.peek()) != null) {
+                if(!resource.get().hasRemaining()) {
+                    outboundQueue.poll();
+                    resource.release();
+                    continue;
+                }
                 WrapTask wrapTask = sslWrapper.wrap(resource);
                 if(wrapTask.result == WrapTaskStatus.WRAPPED_AND_FLUSHED) {
                     outboundQueue.poll();
@@ -98,11 +104,9 @@ public class SslChannelOperations extends ChannelOperations {
         try {
             WrapTask wrapTask = sslWrapper.close();
             if(wrapTask != null  &&  wrapTask.result == WrapTaskStatus.IN_PROGRESS  &&  notTimedOut) {
-                setWriteInterest();
                 return;
             }
-            if(!inboundClosed  &&  wrapTask != null
-                    &&  wrapTask.sslEngineResult.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP
+            if(!inboundClosed  &&  sslEngine.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP
                     &&  notTimedOut) {
                 return;
             }
@@ -144,13 +148,16 @@ public class SslChannelOperations extends ChannelOperations {
             if(pendingTask.result == WrapTaskStatus.IN_PROGRESS) {
                 return;
             }
-            if(pendingTask.source == appWriteResource) {
+            WrapTask wrapTask = pendingTask;
+            pendingTask = null;
+            if(wrapTask.source == appWriteResource) {
                 appWriteResource.get().clear();
             }
-            if(!onConnectInvoked  &&  pendingTask.handShakeStatus == SSLEngineResult.HandshakeStatus.FINISHED) {
+            if(!onConnectInvoked  &&  wrapTask.handShakeStatus == SSLEngineResult.HandshakeStatus.FINISHED) {
                 onConnectInvoked = true;
                 onConnect.run();
             }
+            pendingTask = null;
         }
 
         private void wrap() throws IOException, InternalException {
