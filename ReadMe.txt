@@ -26,7 +26,7 @@ Http codec: Minimalistic and lenient implementation is given for demonstration p
 
 SSL notes: If self-signed certificate expires, it has to be regenerated.
     Keystore path: src/main/resources/keyStore.jks
-    For passphrase: check: src/main/java/ramana/example/niotcpserver/util/SslContextUtil.java
+    For passphrase: Refer: src/main/java/ramana/example/niotcpserver/util/SslContextUtil.java
 
 For examples and test cases:
     Refer test folder: src/test/java
@@ -35,6 +35,6 @@ For examples and test cases:
         2. Http codec:
                 src/test/java/ramana/example/niotcpserver/example/codec/http
                 src/test/java/ramana/example/niotcpserver/example/codec/http/v1
-                src/test/java/ramana/example/niotcpserver/example/codec/http/v1/ssl
+        3. SSL: src/test/java/ramana/example/niotcpserver/example/codec/http/v1/ssl
 
 
