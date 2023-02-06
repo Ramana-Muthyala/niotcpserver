@@ -98,8 +98,8 @@ public class InternalChannelHandler {
         }
 
         SslChannelOperations sslChannelOperations = (SslChannelOperations) channelOperations;
-        if(sslMode != SslMode.SERVER) sslChannelOperations.beginHandShake();
         sslChannelOperations.onConnect(onConnect);
+        if(sslMode != SslMode.SERVER) sslChannelOperations.beginHandShake();
     }
 
     private void onClose(DefaultContext context) {
