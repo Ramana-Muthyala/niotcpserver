@@ -36,7 +36,6 @@ public class HelloServer {
         @Override
         public void onRead(Context.OnRead context, Object data) throws InternalException {
             logger.info("Received: " + Util.toString(data));
-            context.close();
         }
     }
 }

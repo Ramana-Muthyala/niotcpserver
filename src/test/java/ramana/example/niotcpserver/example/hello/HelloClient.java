@@ -26,6 +26,7 @@ public class HelloClient {
             logger.info("Received: " + Util.toString(data));
             context.write(data);
             context.flush();
+            context.close();
         }
     }
 }
