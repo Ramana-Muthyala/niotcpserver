@@ -1,4 +1,4 @@
-package ramana.example.niotcpserver.worker.impl;
+package ramana.example.niotcpserver.internal.handler;
 
 import ramana.example.niotcpserver.handler.ChannelHandler;
 import ramana.example.niotcpserver.io.Allocator;
@@ -6,7 +6,7 @@ import ramana.example.niotcpserver.io.ChannelOperations;
 import ramana.example.niotcpserver.io.SslChannelOperations;
 import ramana.example.niotcpserver.io.SslMode;
 import ramana.example.niotcpserver.log.LogFactory;
-import ramana.example.niotcpserver.types.ChannelHandlerMethodName;
+import ramana.example.niotcpserver.types.Event;
 import ramana.example.niotcpserver.types.InternalException;
 import ramana.example.niotcpserver.types.LinkedList;
 import ramana.example.niotcpserver.util.SslContextUtil;
@@ -52,7 +52,7 @@ public class InternalChannelHandler {
 
     public void handleRead() {
         LinkedList.LinkedNode<ChannelHandler> channelHandlerNode = channelHandlers.head;
-        DefaultContext context = factory.newContext(this, channelHandlerNode, ChannelHandlerMethodName.onRead);
+        DefaultContext context = factory.newContext(this, channelHandlerNode, Event.onRead);
         try {
             Object data = channelOperations.read();
             if(data instanceof Integer) {
@@ -60,7 +60,7 @@ public class InternalChannelHandler {
                     // no data read
                     return;
                 }
-                context.channelHandlerMethodName = ChannelHandlerMethodName.onReadComplete;
+                context.event = Event.onReadComplete;
                 channelHandlerNode.value.onReadComplete(context, null);
                 onClose(context);
             } else {
@@ -81,7 +81,7 @@ public class InternalChannelHandler {
 
         Runnable onConnect = () -> {
             LinkedList.LinkedNode<ChannelHandler> channelHandlerNode = channelHandlers.head;
-            DefaultContext context = factory.newContext(this, channelHandlerNode, ChannelHandlerMethodName.onConnect);
+            DefaultContext context = factory.newContext(this, channelHandlerNode, Event.onConnect);
             try {
                 this.socketAddress = "[" + channel.getLocalAddress().toString() + " - " + channel.getRemoteAddress().toString() + "]";
                 channelHandlerNode.value.onConnect(context, null);
@@ -153,9 +153,9 @@ public class InternalChannelHandler {
     }
 
     private void next0(DefaultContext context, Object data, DefaultContext newContext) throws InternalException {
-        newContext.channelHandlerMethodName = context.channelHandlerMethodName;
+        newContext.event = context.event;
         LinkedList.LinkedNode<ChannelHandler> nextChannelHandlerNode = context.channelHandlerNode.next;
-        switch (context.channelHandlerMethodName) {
+        switch (context.event) {
             case onConnect:
                 if(nextChannelHandlerNode == null) break;
                 newContext.channelHandlerNode = nextChannelHandlerNode;
@@ -187,7 +187,7 @@ public class InternalChannelHandler {
         if(context.invalidated) return;
         if(closeInitiated) throw new InternalException(InternalException.CHANNEL_CLOSED);
         LinkedList.LinkedNode<ChannelHandler> prevChannelHandlerNode = context.channelHandlerNode.prev;
-        DefaultContext newContext = factory.newContext(this, prevChannelHandlerNode, ChannelHandlerMethodName.onWrite);
+        DefaultContext newContext = factory.newContext(this, prevChannelHandlerNode, Event.onWrite);
         try {
             if(prevChannelHandlerNode != null) {
                 newContext.channelHandlerNode.value.onWrite(newContext, data);

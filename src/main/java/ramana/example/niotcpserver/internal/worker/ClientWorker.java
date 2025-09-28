@@ -1,8 +1,10 @@
-package ramana.example.niotcpserver.worker;
+package ramana.example.niotcpserver.internal.worker;
 
 import ramana.example.niotcpserver.Client;
 import ramana.example.niotcpserver.handler.ChannelHandler;
 import ramana.example.niotcpserver.handler.impl.LoggingHandler;
+import ramana.example.niotcpserver.internal.handler.ContextFactory;
+import ramana.example.niotcpserver.internal.handler.InternalChannelHandler;
 import ramana.example.niotcpserver.io.ClientAllocator;
 import ramana.example.niotcpserver.io.SslMode;
 import ramana.example.niotcpserver.types.LinkedList;
@@ -10,8 +12,6 @@ import ramana.example.niotcpserver.types.SocketOptionException;
 import ramana.example.niotcpserver.util.CompletionSignal;
 import ramana.example.niotcpserver.util.SslContextUtil;
 import ramana.example.niotcpserver.util.Util;
-import ramana.example.niotcpserver.worker.impl.ContextFactory;
-import ramana.example.niotcpserver.worker.impl.InternalChannelHandler;
 
 import java.io.IOError;
 import java.io.IOException;

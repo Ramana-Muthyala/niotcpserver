@@ -1,5 +1,5 @@
 package ramana.example.niotcpserver.types;
 
-public enum ChannelHandlerMethodName {
+public enum Event {
     onConnect, onRead, onReadComplete, onWrite
 }

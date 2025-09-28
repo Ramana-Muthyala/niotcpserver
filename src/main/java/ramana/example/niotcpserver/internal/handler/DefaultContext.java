@@ -1,9 +1,9 @@
-package ramana.example.niotcpserver.worker.impl;
+package ramana.example.niotcpserver.internal.handler;
 
 import ramana.example.niotcpserver.handler.ChannelHandler;
 import ramana.example.niotcpserver.handler.Context;
 import ramana.example.niotcpserver.io.Allocator;
-import ramana.example.niotcpserver.types.ChannelHandlerMethodName;
+import ramana.example.niotcpserver.types.Event;
 import ramana.example.niotcpserver.types.InternalException;
 import ramana.example.niotcpserver.types.LinkedList;
 
@@ -13,13 +13,13 @@ public class DefaultContext implements Context.OnConnect, Context.OnClose {
     private final InternalChannelHandler internalChannelHandler;
     LinkedList.LinkedNode<ChannelHandler> channelHandlerNode;
     boolean invalidated;
-    ChannelHandlerMethodName channelHandlerMethodName;
+    Event event;
     Throwable cause;
 
-    DefaultContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, ChannelHandlerMethodName channelHandlerMethodName) {
+    DefaultContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, Event event) {
         this.internalChannelHandler = internalChannelHandler;
         this.channelHandlerNode = channelHandlerNode;
-        this.channelHandlerMethodName = channelHandlerMethodName;
+        this.event = event;
     }
 
     DefaultContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, Throwable cause) {

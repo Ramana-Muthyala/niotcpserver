@@ -1,4 +1,4 @@
-package ramana.example.niotcpserver.worker;
+package ramana.example.niotcpserver.internal.worker;
 
 import java.nio.channels.SocketChannel;
 

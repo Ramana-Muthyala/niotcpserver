@@ -4,9 +4,9 @@ import ramana.example.niotcpserver.conf.Configuration;
 import ramana.example.niotcpserver.log.LogFactory;
 import ramana.example.niotcpserver.util.CompletionSignal;
 import ramana.example.niotcpserver.util.Constants;
-import ramana.example.niotcpserver.worker.Dispatcher;
-import ramana.example.niotcpserver.worker.Acceptor;
-import ramana.example.niotcpserver.worker.Worker;
+import ramana.example.niotcpserver.internal.worker.Dispatcher;
+import ramana.example.niotcpserver.internal.worker.Acceptor;
+import ramana.example.niotcpserver.internal.worker.Worker;
 
 import java.nio.channels.spi.SelectorProvider;
 import java.util.logging.Level;

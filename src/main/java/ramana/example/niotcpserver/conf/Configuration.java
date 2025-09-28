@@ -2,7 +2,7 @@ package ramana.example.niotcpserver.conf;
 
 import ramana.example.niotcpserver.handler.ChannelHandler;
 import ramana.example.niotcpserver.types.Pair;
-import ramana.example.niotcpserver.worker.Dispatcher;
+import ramana.example.niotcpserver.internal.worker.Dispatcher;
 
 import java.net.SocketOption;
 import java.nio.channels.spi.SelectorProvider;

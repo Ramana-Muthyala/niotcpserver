@@ -1,21 +1,20 @@
-package ramana.example.niotcpserver.worker.impl;
+package ramana.example.niotcpserver.internal.handler;
 
 import ramana.example.niotcpserver.handler.ChannelHandler;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.log.LogFactory;
-import ramana.example.niotcpserver.types.ChannelHandlerMethodName;
+import ramana.example.niotcpserver.types.Event;
 import ramana.example.niotcpserver.types.InternalException;
 import ramana.example.niotcpserver.types.LinkedList;
 import ramana.example.niotcpserver.util.Util;
 
 import java.nio.ByteBuffer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LoggingContext extends DefaultContext {
     private static final Logger logger = LogFactory.getLogger();
-    LoggingContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, ChannelHandlerMethodName channelHandlerMethodName) {
-        super(internalChannelHandler, channelHandlerNode, channelHandlerMethodName);
+    LoggingContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, Event event) {
+        super(internalChannelHandler, channelHandlerNode, event);
     }
 
     LoggingContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, Throwable cause) {

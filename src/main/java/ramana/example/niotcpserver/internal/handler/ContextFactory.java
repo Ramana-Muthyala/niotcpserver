@@ -1,7 +1,7 @@
-package ramana.example.niotcpserver.worker.impl;
+package ramana.example.niotcpserver.internal.handler;
 
 import ramana.example.niotcpserver.handler.ChannelHandler;
-import ramana.example.niotcpserver.types.ChannelHandlerMethodName;
+import ramana.example.niotcpserver.types.Event;
 import ramana.example.niotcpserver.types.LinkedList;
 
 public class ContextFactory {
@@ -13,8 +13,8 @@ public class ContextFactory {
         return new LoggingContextFactory();
     }
 
-    DefaultContext newContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, ChannelHandlerMethodName channelHandlerMethodName) {
-        return new DefaultContext(internalChannelHandler, channelHandlerNode, channelHandlerMethodName);
+    DefaultContext newContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, Event event) {
+        return new DefaultContext(internalChannelHandler, channelHandlerNode, event);
     }
 
     DefaultContext newContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, Throwable cause) {
@@ -27,8 +27,8 @@ public class ContextFactory {
 
     static class LoggingContextFactory extends ContextFactory {
         @Override
-        DefaultContext newContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, ChannelHandlerMethodName channelHandlerMethodName) {
-            return new LoggingContext(internalChannelHandler, channelHandlerNode, channelHandlerMethodName);
+        DefaultContext newContext(InternalChannelHandler internalChannelHandler, LinkedList.LinkedNode<ChannelHandler> channelHandlerNode, Event event) {
+            return new LoggingContext(internalChannelHandler, channelHandlerNode, event);
         }
 
         @Override

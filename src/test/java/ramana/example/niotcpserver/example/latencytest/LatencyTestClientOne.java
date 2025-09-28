@@ -7,7 +7,7 @@ import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.log.LogFactory;
 import ramana.example.niotcpserver.types.InternalException;
 import ramana.example.niotcpserver.util.Util;
-import ramana.example.niotcpserver.worker.ClientWorker;
+import ramana.example.niotcpserver.internal.worker.ClientWorker;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.spi.SelectorProvider;
