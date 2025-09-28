@@ -7,17 +7,19 @@ import java.util.logging.Logger;
 
 public class ScheduledTask implements Comparable<ScheduledTask> {
     private static final Logger logger = LogFactory.getLogger();
-    private final Runnable runnable;
-    public final Long scheduledTime;
-
-    public ScheduledTask(Runnable runnable, long scheduledTime) {
-        this.runnable = runnable;
+    private final Runnable task;
+    public Long scheduledTime;
+    public void setScheduledTime(Long scheduledTime) {
         this.scheduledTime = scheduledTime;
+    }
+
+    public ScheduledTask(Runnable task) {
+        this.task = task;
     }
 
     public void execute() {
         try {
-            runnable.run();
+            task.run();
         } catch (OutOfMemoryError | RuntimeException exception) {
             logger.log(Level.INFO, exception.getMessage(), exception);
         }
@@ -25,6 +27,7 @@ public class ScheduledTask implements Comparable<ScheduledTask> {
 
     @Override
     public int compareTo(ScheduledTask scheduledTask) {
-        return scheduledTime.compareTo(scheduledTask.scheduledTime);
+        int result = Long.compare(scheduledTime, scheduledTask.scheduledTime);
+        return result == 0 ? Integer.compare(hashCode(), scheduledTask.hashCode()) : result;
     }
 }

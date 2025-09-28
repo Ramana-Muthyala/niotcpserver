@@ -6,6 +6,7 @@ import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.io.SslMode;
 import ramana.example.niotcpserver.types.InternalException;
 import ramana.example.niotcpserver.types.LinkedList;
+import ramana.example.niotcpserver.types.ScheduledTask;
 import ramana.example.niotcpserver.util.SslContextUtil;
 
 import java.io.IOException;
@@ -15,29 +16,25 @@ import java.nio.channels.SelectionKey;
 public class IdleTimeoutInternalChannelHandler extends InternalChannelHandler {
     private final int idleTimeoutInMilliSec;
     private final Worker worker;
-    private final boolean loggingEnabled;
-    private long idleTimeoutTicker;
+    private final ScheduledTask scheduledTask;
 
     public IdleTimeoutInternalChannelHandler(LinkedList<ChannelHandler> channelHandlers, ContextFactory factory, boolean defaultRead, Worker worker, int idleTimeout, boolean loggingEnabled) {
         super(channelHandlers, worker.allocator, factory, defaultRead);
         this.worker = worker;
         idleTimeoutInMilliSec = idleTimeout * 1000;
-        this.loggingEnabled = loggingEnabled;
+        this.scheduledTask = new ScheduledTask(() -> {
+            if(channelOperations.isClosed()) return;
+            if(loggingEnabled) {
+                logger.info(getSocketAddress() + " Timed out: Closing channel");
+            }
+            channelOperations.flushAndClose();
+        });
     }
 
     private void scheduleIdleTimeoutTask() {
-        idleTimeoutTicker = System.currentTimeMillis();
-        final long futureTime = idleTimeoutTicker + idleTimeoutInMilliSec;
-        Runnable task = () -> {
-            if(channelOperations.isClosed()) return;
-            if(futureTime - idleTimeoutTicker == idleTimeoutInMilliSec) {
-                if(loggingEnabled) {
-                    logger.info(getSocketAddress() + " Timed out: Closing channel");
-                }
-                channelOperations.flushAndClose();
-            }
-        };
-        worker.schedule(task, futureTime);
+        if(scheduledTask.scheduledTime != null) worker.remove(scheduledTask);
+        scheduledTask.setScheduledTime(System.currentTimeMillis() + idleTimeoutInMilliSec);
+        worker.add(scheduledTask);
     }
 
     @Override
@@ -61,24 +58,24 @@ public class IdleTimeoutInternalChannelHandler extends InternalChannelHandler {
     @Override
     public void fireReadInterest(DefaultContext context) throws InternalException {
         super.fireReadInterest(context);
-        idleTimeoutTicker = System.currentTimeMillis();
+        scheduleIdleTimeoutTask();
     }
 
     @Override
     public void clearReadInterest(DefaultContext context) throws InternalException {
         super.clearReadInterest(context);
-        idleTimeoutTicker = System.currentTimeMillis();
+        scheduleIdleTimeoutTask();
     }
 
     @Override
     public void write(DefaultContext context, Object data) throws InternalException {
         super.write(context, data);
-        idleTimeoutTicker = System.currentTimeMillis();
+        scheduleIdleTimeoutTask();
     }
 
     @Override
     public void flush(DefaultContext context) throws InternalException {
         super.flush(context);
-        idleTimeoutTicker = System.currentTimeMillis();
+        scheduleIdleTimeoutTask();
     }
 }

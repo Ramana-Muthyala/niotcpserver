@@ -5,6 +5,7 @@ import ramana.example.niotcpserver.conf.Configuration;
 import ramana.example.niotcpserver.handler.ChannelHandler;
 import ramana.example.niotcpserver.handler.impl.LoggingHandler;
 import ramana.example.niotcpserver.internal.handler.ContextFactory;
+import ramana.example.niotcpserver.internal.handler.IdleTimeoutInternalChannelHandler;
 import ramana.example.niotcpserver.internal.handler.InternalChannelHandler;
 import ramana.example.niotcpserver.io.AllocatorInternal;
 import ramana.example.niotcpserver.io.DefaultAllocator;
@@ -16,7 +17,6 @@ import ramana.example.niotcpserver.util.CompletionSignal;
 import ramana.example.niotcpserver.util.Constants;
 import ramana.example.niotcpserver.util.SslContextUtil;
 import ramana.example.niotcpserver.util.Util;
-import ramana.example.niotcpserver.internal.handler.IdleTimeoutInternalChannelHandler;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -25,8 +25,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -36,7 +36,7 @@ public class Worker extends AbstractWorker {
     private static final SelectionStrategy SELECT_TIMEOUT = new SelectionStrategy(Selection.SELECT_TIMEOUT);
     private final Queue<SocketChannel> channels = new ConcurrentLinkedQueue<>();
     private final boolean sslEnabled;
-    private PriorityQueue<ScheduledTask> scheduledTasks;
+    private TreeSet<ScheduledTask> scheduledTasks;
     private final boolean defaultRead;
     private final Server server;
     private final List<Class<? extends ChannelHandler>> channelHandlers;
@@ -48,7 +48,7 @@ public class Worker extends AbstractWorker {
         super(initSignal, configuration.getSelectorProvider(), configuration.getSocketOptions(), configuration.isLoggingEnabled());
         channelHandlers = configuration.getChannelHandlers();
         idleTimeout = configuration.getIdleTimeout();
-        if(idleTimeout != 0) scheduledTasks = new PriorityQueue<>(Constants.SCHEDULED_TASK_QUEUE_INITIAL_CAPACITY);
+        if(idleTimeout != 0) scheduledTasks = new TreeSet<>();
         defaultRead = configuration.isDefaultRead();
         sslEnabled = configuration.isSslEnabled();
         this.server = server;
@@ -103,10 +103,10 @@ public class Worker extends AbstractWorker {
             selectionStrategy = SELECT;
             return;
         }
-        long diff = scheduledTasks.peek().scheduledTime - System.currentTimeMillis();
-        if(diff > 0) {
+        long selectTimeout = scheduledTasks.first().scheduledTime - System.currentTimeMillis();
+        if(selectTimeout > 0) {
             selectionStrategy = SELECT_TIMEOUT;
-            selectionStrategy.timeout = diff;
+            selectionStrategy.timeout = selectTimeout;
             return;
         }
         selectionStrategy = SELECT_NOW;
@@ -117,11 +117,11 @@ public class Worker extends AbstractWorker {
         allocator.recycle(); // free memory
         if(directAllocator != null) directAllocator.recycle();
         long currentTime = System.currentTimeMillis();
-        ScheduledTask task;
-        while ((task = scheduledTasks.peek()) != null) {
+        while (!scheduledTasks.isEmpty()) {
+            ScheduledTask task = scheduledTasks.first();
             if(task.scheduledTime > currentTime) return;
             task.execute();
-            scheduledTasks.poll();
+            scheduledTasks.pollFirst();
         }
     }
 
@@ -173,7 +173,11 @@ public class Worker extends AbstractWorker {
         if(sk.isValid() && sk.isWritable()) internalChannelHandler.handleWrite();
     }
 
-    public void schedule(Runnable task, long futureTime) {
-        scheduledTasks.offer(new ScheduledTask(task, futureTime));
+    public void add(ScheduledTask scheduledTask) {
+        scheduledTasks.add(scheduledTask);
+    }
+
+    public void remove(ScheduledTask scheduledTask) {
+        scheduledTasks.remove(scheduledTask);
     }
 }

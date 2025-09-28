@@ -13,7 +13,6 @@ public interface Constants {
     int CACHE_NORMAL_CAPACITY = 1 << 16;
     int CACHE_SMALL_SIZE = 256;
     int CACHE_NORMAL_SIZE = 64;
-    int SCHEDULED_TASK_QUEUE_INITIAL_CAPACITY = 1 << 16;
     int CACHE_CLIENT_SMALL_SIZE = 16;
     int CACHE_CLIENT_NORMAL_SIZE = 16;
 }
