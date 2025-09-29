@@ -33,7 +33,7 @@ public class HttpsClient {
             String request = "GET / HTTP/1.1\r\n" +
                     "Host:" + host + "\r\n" +
                     "User-Agent:NIOTCPServer/1.0\r\n" +
-                    "Accept:*.*\r\n" +
+                    "Accept:*/*\r\n" +
                     "\r\n";
             buffer.put(request.getBytes());
             context.write(resource);

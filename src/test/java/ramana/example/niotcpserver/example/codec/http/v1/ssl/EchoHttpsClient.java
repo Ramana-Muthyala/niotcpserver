@@ -31,7 +31,7 @@ public class EchoHttpsClient {
             String request = "GET /index.html?name=ramana HTTP/1.1\r\n" +
                     "Host:localhost\r\n" +
                     "User-Agent:NIOTCPServer/1.0\r\n" +
-                    "Accept:*.*\r\n" +
+                    "Accept:*/*\r\n" +
                     "Accept-Encoding:gzip, deflate, br\r\n" +
                     "Connection:keep-alive\r\n" +
                     "\r\n";
