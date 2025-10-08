@@ -24,9 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.List;
-import java.util.Queue;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -36,7 +34,8 @@ public class Worker extends AbstractWorker {
     private static final SelectionStrategy SELECT_TIMEOUT = new SelectionStrategy(Selection.SELECT_TIMEOUT);
     private final Queue<SocketChannel> channels = new ConcurrentLinkedQueue<>();
     private final boolean sslEnabled;
-    private TreeSet<ScheduledTask> scheduledTasks;
+    public final AsyncPool asyncPool;
+    private NavigableSet<ScheduledTask> scheduledTasks;
     private final boolean defaultRead;
     private final Server server;
     private final List<Class<? extends ChannelHandler>> channelHandlers;
@@ -48,9 +47,10 @@ public class Worker extends AbstractWorker {
         super(initSignal, configuration.getSelectorProvider(), configuration.getSocketOptions(), configuration.isLoggingEnabled());
         channelHandlers = configuration.getChannelHandlers();
         idleTimeout = configuration.getIdleTimeout();
-        if(idleTimeout != 0) scheduledTasks = new TreeSet<>();
         defaultRead = configuration.isDefaultRead();
         sslEnabled = configuration.isSslEnabled();
+        asyncPool = server.getAsyncPool();
+        if(idleTimeout != 0  ||  asyncPool != null) scheduledTasks = Collections.synchronizedNavigableSet(new TreeSet<>());
         this.server = server;
         Function<Integer, ByteBuffer> allocatorFunction = sslEnabled ? ByteBuffer::allocate : ByteBuffer::allocateDirect;
         allocator = new DefaultAllocator(allocatorFunction);
@@ -152,6 +152,7 @@ public class Worker extends AbstractWorker {
             ContextFactory factory = loggingEnabled ? ContextFactory.loggingFactory() : ContextFactory.factory();
             InternalChannelHandler internalChannelHandler = idleTimeout == 0 ? new InternalChannelHandler(channelHandlerList, allocator, factory, defaultRead) : new IdleTimeoutInternalChannelHandler(channelHandlerList, factory, defaultRead, this, idleTimeout, loggingEnabled);
             SelectionKey sk = channel.register(selector, ops, internalChannelHandler);
+            internalChannelHandler.setWorker(this);
             internalChannelHandler.onConnect(sk, sslEnabled ? SslMode.SERVER : SslMode.NONE, directAllocator);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException
                  | InvocationTargetException | SocketOptionException | SslContextUtil.SSLContextException exception) {
@@ -175,6 +176,7 @@ public class Worker extends AbstractWorker {
 
     public void add(ScheduledTask scheduledTask) {
         scheduledTasks.add(scheduledTask);
+        selector.wakeup();
     }
 
     public void remove(ScheduledTask scheduledTask) {

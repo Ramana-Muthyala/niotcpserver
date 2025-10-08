@@ -62,6 +62,11 @@ public class Bootstrap {
     }
 
     private int numWorkers = Constants.DEFAULT_NUM_WORKERS;
+    private int asyncWorkers;
+
+    public int getAsyncWorkers() {
+        return asyncWorkers;
+    }
 
     public Bootstrap channelHandler(Class<? extends ChannelHandler> channelHandler) {
         channelHandlers.add(channelHandler);
@@ -71,7 +76,8 @@ public class Bootstrap {
     public void start() {
         long beginTime = System.currentTimeMillis();
         validate();
-        logger.info("NioTcpServer: Workers: " + numWorkers);
+        String asyncInfo = asyncWorkers == 0 ? "" : ", Async Workers: " + asyncWorkers;
+        logger.info("NioTcpServer: Workers: " + numWorkers + asyncInfo);
         logger.info("Channel Handlers: " + Util.normalizeClassName(channelHandlers));
         Server server = new Server(this);
         try {
@@ -139,5 +145,10 @@ public class Bootstrap {
 
     public boolean isSslEnabled() {
         return sslEnabled;
+    }
+
+    public Bootstrap enableAsync(int asyncWorkers) {
+        this.asyncWorkers = asyncWorkers;
+        return this;
     }
 }

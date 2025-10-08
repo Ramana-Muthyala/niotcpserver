@@ -1,6 +1,7 @@
 package ramana.example.niotcpserver.internal.handler;
 
 import ramana.example.niotcpserver.handler.ChannelHandler;
+import ramana.example.niotcpserver.internal.worker.Worker;
 import ramana.example.niotcpserver.io.Allocator;
 import ramana.example.niotcpserver.io.ChannelOperations;
 import ramana.example.niotcpserver.io.SslChannelOperations;
@@ -29,6 +30,11 @@ public class InternalChannelHandler {
     protected boolean closeInitiated;
     private final ContextFactory factory;
     private String socketAddress;
+    protected Worker worker;
+    
+    public void setWorker(Worker worker) {
+        this.worker = worker;
+    }
 
     public String getSocketAddress() {
         return socketAddress;

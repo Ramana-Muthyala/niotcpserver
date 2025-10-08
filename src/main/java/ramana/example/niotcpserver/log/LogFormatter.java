@@ -13,7 +13,7 @@ public class LogFormatter extends Formatter {
 
     @Override
     public String format(LogRecord record) {
-        Date dat = new Date(record.getMillis());
+        Date date = new Date(record.getMillis());
         String source;
         if (record.getSourceClassName() != null) {
             source = record.getSourceClassName();
@@ -36,7 +36,7 @@ public class LogFormatter extends Formatter {
         }
         String threadName = Thread.currentThread().getName();
         return String.format(format,
-                dat,
+                date,
                 source,
                 record.getLoggerName(),
                 record.getLevel().getName(),

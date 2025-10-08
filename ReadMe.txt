@@ -15,9 +15,10 @@ Event propagation (Channel handler chain):
 Design notes:
     1. Event loop mechanism.
     2. Thread per selector.
-    3. Processing as of now is carried out in event loop itself.
-    4. Design permits and can evolve to offload heavy processing to another thread pool.
-        As of now this is not implemented.
+    3. Processing is carried out in event loop itself.
+    4. Heavy processing can be offloaded to separate thread pool.
+        refer: src/main/java/ramana/example/niotcpserver/handler/Context.java
+            refer OnWrite.async method.
 
 
 Http codec: Minimalistic and lenient implementation is given for demonstration purpose.
@@ -33,8 +34,10 @@ For examples and test cases:
     Few samples to start with:
         1. NIOTcpServer: src/test/java/ramana/example/niotcpserver/example/echo
         2. Http codec:
-                src/test/java/ramana/example/niotcpserver/example/codec/http
-                src/test/java/ramana/example/niotcpserver/example/codec/http/v1
+            src/test/java/ramana/example/niotcpserver/example/codec/http
+            src/test/java/ramana/example/niotcpserver/example/codec/http/v1
         3. SSL: src/test/java/ramana/example/niotcpserver/example/codec/http/v1/ssl
+        4. Offloading heavy processing: src/test/java/ramana/example/niotcpserver/example/async
+
 
 

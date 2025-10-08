@@ -1,15 +1,19 @@
 package ramana.example.niotcpserver;
 
 import ramana.example.niotcpserver.conf.Configuration;
+import ramana.example.niotcpserver.internal.worker.Acceptor;
+import ramana.example.niotcpserver.internal.worker.AsyncPool;
+import ramana.example.niotcpserver.internal.worker.Dispatcher;
+import ramana.example.niotcpserver.internal.worker.Worker;
 import ramana.example.niotcpserver.log.LogFactory;
+import ramana.example.niotcpserver.log.LogFormatter;
 import ramana.example.niotcpserver.util.CompletionSignal;
 import ramana.example.niotcpserver.util.Constants;
-import ramana.example.niotcpserver.internal.worker.Dispatcher;
-import ramana.example.niotcpserver.internal.worker.Acceptor;
-import ramana.example.niotcpserver.internal.worker.Worker;
 
 import java.nio.channels.spi.SelectorProvider;
+import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class Server {
@@ -19,16 +23,24 @@ public class Server {
     private int numWorkers;
     private Acceptor acceptor;
     private Worker[] workers;
+    private AsyncPool asyncPool;
     private static final long shutDownTimeout = Constants.SERVER_SHUTDOWN_TIMEOUT;
     private Thread shutDownHook;
     private final Object shutDownLock = new Object();
     private boolean shutDownCompleted;
+
+    public AsyncPool getAsyncPool() {
+        return asyncPool;
+    }
 
     public Server(Bootstrap bootstrap) {
         this.bootstrap = bootstrap;
     }
 
     public void start() throws CompletionSignal.CompletionSignalException, InterruptedException {
+        if(bootstrap.getAsyncWorkers() > 0) {
+            asyncPool = new AsyncPool(bootstrap.getAsyncWorkers());
+        }
         SelectorProvider provider = SelectorProvider.provider();
         Dispatcher dispatcher = new Dispatcher();
         Configuration.ServerConfiguration serverConfiguration = new Configuration.ServerConfiguration(provider, bootstrap.getServerSocketOptions(), bootstrap.getPort(), dispatcher, bootstrap.getBacklog());
@@ -55,6 +67,7 @@ public class Server {
                 if(shutDownCompleted) return;
                 logger.info("Initiating shutdown.");
                 try {
+                    if(asyncPool != null) asyncPool.shutDown();
                     CompletionSignal shutDownSignal = new CompletionSignal(numWorkers + 1);
                     acceptor.shutDown(shutDownSignal);
                     for (Worker worker: workers) {
@@ -64,7 +77,21 @@ public class Server {
                 } catch (InterruptedException | CompletionSignal.CompletionSignalException e) {
                     logger.log(Level.SEVERE, e.getMessage(), e);
                 }
-                logger.info("--- Shutdown complete ---");
+
+                // jdk logger also uses shutdown hooks.
+                // if logger shutdown hook is executed before this hook or in parallel,
+                // log statements won't be executed as log handlers are reset in jdk logging shutdown hook.
+                // Invoking System.out directly to have a log that shutdown has completed.
+                LogRecord record = new LogRecord(Level.INFO, "Shutdown complete.");
+                Arrays.stream(Thread.currentThread().getStackTrace())
+                        .filter(stackTraceElement -> stackTraceElement.getClassName().equals(Server.class.getName()))
+                        .findFirst().ifPresent(stackTraceLement -> {
+                    record.setSourceClassName(stackTraceLement.getClassName());
+                    record.setSourceMethodName(stackTraceLement.getMethodName());
+                });
+                record.setLoggerName(logger.getName());
+                System.out.println(new LogFormatter().format(record));
+
                 shutDownCompleted = true;
             }
         };
