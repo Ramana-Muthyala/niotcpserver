@@ -118,6 +118,9 @@ public class Worker extends AbstractWorker {
         if(directAllocator != null) directAllocator.recycle();
         long currentTime = System.currentTimeMillis();
         while (!scheduledTasks.isEmpty()) {
+            // As of now scheduledTasks.remove() is invoked from IdleTimeoutInternalChannelHandler
+            // i.e. from the same worker thread.
+            // Chances of scheduledTasks.first() throwing NoSuchElementException do not exist.
             ScheduledTask task = scheduledTasks.first();
             if(task.scheduledTime > currentTime) return;
             task.execute();
