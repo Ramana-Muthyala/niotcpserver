@@ -18,7 +18,7 @@ Design notes:
     3. Processing is carried out in event loop itself.
     4. Heavy processing can be offloaded to separate thread pool.
         refer: src/main/java/ramana/example/niotcpserver/handler/Context.java
-            refer OnWrite.async method.
+            refer: OnWrite.async method.
 
 
 Http codec: Minimalistic and lenient implementation is given for demonstration purpose.

@@ -72,9 +72,11 @@ public class DefaultContext implements Context.OnConnect, Context.OnClose {
 
     @Override
     public <T, R> void async(T input, Function<T, R> task, BiConsumer<R, Context.OnWrite> callback, TriConsumer<T, Context.OnWrite, Exception> errorCallback) throws InternalException {
+        if(internalChannelHandler.worker.asyncPool == null) {
+            throw new InternalException("Async processing is not enabled.");
+        }
         if(task == null  ||  callback == null  ||  errorCallback == null) {
-            close();
-            return;
+            throw new InternalException("Either task, callback, or errorCallback is null.");
         }
         asyncInvoked = true;
         AsyncPool.Task<T, R> asyncTask = new AsyncPool.Task<>(input, task, this, callback, errorCallback, internalChannelHandler.worker);

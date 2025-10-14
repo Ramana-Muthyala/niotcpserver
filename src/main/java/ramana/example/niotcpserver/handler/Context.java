@@ -30,8 +30,8 @@ public interface Context {
         * It is like proceeding where we left off and that is the correct way of doing it.
         *
         * Parameters:
-        * input may be null
-        * If task or callback or errorCallback are null, the channel is closed.
+        * input may be null.
+        * If task or callback or errorCallback are null, InternalException is thrown.
          * */
         <T, R> void async(T input, Function<T, R> task, BiConsumer<R, OnWrite> callback, TriConsumer<T, OnWrite, Exception> errorCallback) throws InternalException;
         void close() throws InternalException;
