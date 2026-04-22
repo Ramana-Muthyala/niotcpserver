@@ -33,11 +33,11 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractParser<L
                     if(byteBuffer.hasRemaining()) dataDeque.offer(data);
                     result.add(parser.result);
                     parser.reset();
+                } else if (parser.status == Status.PARSE_COMPLETE) {
+                    result.add(parser.result);
+                    status = Status.DONE;
+                    return;
                 }
-            } catch (ParseCompleteSignalException exception) {
-                result.add(parser.result);
-                status = Status.DONE;
-                return;
             } catch (ParseException exception) {
                 status = Status.DONE;
                 throw new ParseCompletePushBackSignalException(exception, dataDeque.peek());

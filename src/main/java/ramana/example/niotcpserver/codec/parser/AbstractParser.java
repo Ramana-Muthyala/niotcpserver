@@ -24,5 +24,5 @@ public abstract class AbstractParser<T> {
         status = Status.NONE;
     }
 
-    public enum Status {NONE, IN_PROGRESS, DONE}
+    public enum Status {NONE, IN_PROGRESS, PARSE_COMPLETE, DONE}
 }

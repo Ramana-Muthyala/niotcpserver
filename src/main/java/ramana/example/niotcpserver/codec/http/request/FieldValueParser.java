@@ -22,9 +22,9 @@ public class FieldValueParser extends AbstractParser<String> {
         try {
             parser.parse(data);
         } catch (DelimiterBreakPointParseException exception) {
-            status = Status.DONE;
+            status = Status.PARSE_COMPLETE;
             result = parser.getResult().trim();
-            throw new ParseCompleteSignalException(exception);
+            return;
         }
         if(parser.getStatus() == Status.DONE) {
             byteBuffer.position(byteBuffer.position() + 1);

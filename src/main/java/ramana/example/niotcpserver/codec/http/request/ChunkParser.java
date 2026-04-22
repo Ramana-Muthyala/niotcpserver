@@ -62,7 +62,8 @@ public class ChunkParser extends AbstractParser<byte[]> {
                     lastChunkParser.parse(data);
                     if(lastChunkParser.getStatus() == Status.DONE) {
                         result = new byte[0];
-                        throw new ParseCompleteSignalException();
+                        status = Status.PARSE_COMPLETE;
+                        return;
                     }
                     break;
             }

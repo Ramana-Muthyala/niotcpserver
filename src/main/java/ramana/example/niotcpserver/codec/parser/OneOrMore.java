@@ -34,13 +34,7 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
         ByteBuffer byteBuffer = data.get();
         while(byteBuffer.hasRemaining()) {
             AbstractParser parser = parsers[index];
-            try {
-                parser.parse(data);
-            } catch (ParseCompleteSignalException exception) {
-                composeResult(parser);
-                status = Status.DONE;
-                return;
-            }
+            parser.parse(data);
             if(parser.status == Status.DONE) {
                 composeResult(parser);
                 index++;
@@ -48,6 +42,10 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
                     status = Status.DONE;
                     return;
                 }
+            } else if(parser.status == Status.PARSE_COMPLETE) {
+                composeResult(parser);
+                status = Status.DONE;
+                return;
             }
         }
     }
