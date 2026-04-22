@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class FieldLineParser extends CompositeParser<Field> {
     public FieldLineParser() {
-        parsers.add(new DelimiterStringParser(Util.COLON, Util.CR, Util.REQ_FIELD_MAX_LEN, Util.REQ_FIELD_MAX_LEN));
+        parsers.add(new DelimiterStringParser(Util.COLON, Util.CR, true, Util.REQ_FIELD_MAX_LEN, Util.REQ_FIELD_MAX_LEN));
         parsers.add(new OneByte(Util.COLON));
         parsers.add(new OneOrMore<>(new FieldValueParser()));
         parsers.add(Util.createCRLFParser());

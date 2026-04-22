@@ -6,7 +6,7 @@ import ramana.example.niotcpserver.codec.parser.DelimiterStringParser;
 
 public class LastChunkParser extends CompositeParser<Void> {
     public LastChunkParser() {
-        parsers.add(new DelimiterStringParser(Util.CR, Util.CR, Util.REQ_CHUNK_EXT_MAX_LEN, Util.REQ_CHUNK_EXT_MAX_LEN));
+        parsers.add(new DelimiterStringParser(Util.CR, Util.CR, true, Util.REQ_CHUNK_EXT_MAX_LEN, Util.REQ_CHUNK_EXT_MAX_LEN));
         parsers.add(Util.createCRLFParser());
     }
 

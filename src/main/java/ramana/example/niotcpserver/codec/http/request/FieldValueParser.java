@@ -11,7 +11,7 @@ public class FieldValueParser extends AbstractParser<String> {
     private final DelimiterStringParser parser;
 
     public FieldValueParser() {
-        parser = new DelimiterStringParser(Util.COMMA, Util.CR, Util.REQ_FIELD_VAL_MAX_LEN, Util.REQ_FIELD_VAL_MAX_LEN);
+        parser = new DelimiterStringParser(Util.COMMA, Util.CR, true, Util.REQ_FIELD_VAL_MAX_LEN, Util.REQ_FIELD_VAL_MAX_LEN);
     }
 
     @Override

@@ -11,15 +11,13 @@ public abstract class DelimiterParser<T> extends AbstractParser<T> {
     private final int maxParseLength;
     private final int accumulatorCapacity;
     private final byte breakPoint;
+    private final boolean rewind;
     private int index;
 
-    /*
-    * DelimiterParser is not suitable for repeatable (such as ZeroOrMore, OneOrMore) parsing as it
-    * rewinds the byte read when delimiter or breakpoint is reached.
-    * */
-    public DelimiterParser(byte delimiter, byte breakPoint, int maxParseLength, int accumulatorCapacity) {
+    public DelimiterParser(byte delimiter, byte breakPoint, boolean rewind, int maxParseLength, int accumulatorCapacity) {
         this.delimiter = delimiter;
         this.breakPoint = breakPoint;
+        this.rewind = rewind;
         this.maxParseLength = maxParseLength;
         this.accumulatorCapacity = accumulatorCapacity;
         this.accumulator = new Accumulator(accumulatorCapacity);
@@ -33,13 +31,13 @@ public abstract class DelimiterParser<T> extends AbstractParser<T> {
             if(index == maxParseLength) throw new ParseException();
             byte tmp = byteBuffer.get();
             if(tmp == delimiter) {
-                byteBuffer.position(byteBuffer.position() - 1);
+                if(rewind) byteBuffer.position(byteBuffer.position() - 1);
                 composeResult();
                 status = Status.DONE;
                 return;
             }
             if(tmp == breakPoint) {
-                byteBuffer.position(byteBuffer.position() - 1);
+                if(rewind) byteBuffer.position(byteBuffer.position() - 1);
                 composeResult();
                 throw new DelimiterBreakPointParseException();
             }

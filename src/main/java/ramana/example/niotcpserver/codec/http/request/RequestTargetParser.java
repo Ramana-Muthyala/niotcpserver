@@ -19,7 +19,7 @@ public class RequestTargetParser extends AbstractParser<RequestTarget> {
         * As it is just an example, I am using DelimiterParser.
         * Can be changed anytime.
         * */
-        parser = new DelimiterStringParser(Util.SP, Util.CR, Util.REQ_TARGET_MAX_LEN, Util.REQ_TARGET_MAX_LEN);
+        parser = new DelimiterStringParser(Util.SP, Util.CR, true, Util.REQ_TARGET_MAX_LEN, Util.REQ_TARGET_MAX_LEN);
     }
 
     @Override

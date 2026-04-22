@@ -17,8 +17,8 @@ public class ChunkParser extends AbstractParser<byte[]> {
     private FixedLengthParser chunkDataParser;
 
     public ChunkParser() {
-        chunkLenParser = new MultipleDelimiterStringParser(new byte[]{ Util.SEMI_COLON, Util.SP }, Util.CR, Util.REQ_CHUNK_LEN_MAX_LEN, Util.REQ_CHUNK_LEN_MAX_LEN);
-        chunkExtParser = new DelimiterStringParser(Util.CR, Util.CR, Util.REQ_CHUNK_EXT_MAX_LEN, Util.REQ_CHUNK_EXT_MAX_LEN);
+        chunkLenParser = new MultipleDelimiterStringParser(new byte[]{ Util.SEMI_COLON, Util.SP }, Util.CR, true, Util.REQ_CHUNK_LEN_MAX_LEN, Util.REQ_CHUNK_LEN_MAX_LEN);
+        chunkExtParser = new DelimiterStringParser(Util.CR, Util.CR, true, Util.REQ_CHUNK_EXT_MAX_LEN, Util.REQ_CHUNK_EXT_MAX_LEN);
         crlfParser = Util.createCRLFParser();
         lastChunkParser = new LastChunkParser();
     }
