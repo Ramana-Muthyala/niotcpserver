@@ -7,9 +7,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 /*
-* Parsers that throw ParseCompletePushBackSignalException (ZeroOrMore, OneOrMore) must not be used
-* with EitherOf as the context is different.
-* ParseCompletePushBackSignalException is not handled by EitherOf.
+* Parsers that use Status.PUSH_BACK_DATA (ZeroOrMore, OneOrMore)
+* must not be used with EitherOf as the context is different.
+* Status.PUSH_BACK_DATA is not handled by EitherOf.
 * */
 public class EitherOf<T, P extends AbstractParser<T>> extends AbstractPushbackParser<T> {
     private final ArrayList<P> parsers;

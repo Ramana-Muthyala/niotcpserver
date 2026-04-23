@@ -20,18 +20,12 @@ public class HeadersParser extends ZeroOrMore<Field, FieldLineParser> {
 
     @Override
     public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
-        ParseCompletePushBackSignalException pushBackSignal = null;
-        try {
-            super.parse(data);
-        } catch (ParseCompletePushBackSignalException exception) {
-            pushBackSignal = exception;
-        }
+        super.parse(data);
 
-        if(status == Status.DONE) {
+        if(status == Status.DONE  ||  status == Status.PUSH_BACK_DATA) {
             headers = Util.toMap(result);
             AbstractParser bodyParser = checkBodyProcessorHeaders();
             if(bodyParser != null) requestParser.add(bodyParser);
-            if(pushBackSignal != null) throw pushBackSignal;
         }
     }
 

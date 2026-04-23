@@ -29,7 +29,7 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
 
     @Override
     public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
-        if(status == Status.DONE) return;
+        if(status == Status.DONE  ||  status == Status.PUSH_BACK_DATA) return;
         status = Status.IN_PROGRESS;
         ByteBuffer byteBuffer = data.get();
         while(byteBuffer.hasRemaining()) {
@@ -46,6 +46,10 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
                 composeResult(parser);
                 status = Status.DONE;
                 return;
+            } else if(parser.status == Status.PUSH_BACK_DATA) {
+                status = Status.PUSH_BACK_DATA;
+                super.data = parser.getData();
+                return;
             }
         }
     }
@@ -55,7 +59,7 @@ public class OneOrMore<T, P extends AbstractParser<T>> extends AbstractParser<Li
         index = 0;
         parsers[0].reset();
         parsers[1].reset();
+        super.reset();
         result = new ArrayList<>();
-        status = Status.NONE;
     }
 }

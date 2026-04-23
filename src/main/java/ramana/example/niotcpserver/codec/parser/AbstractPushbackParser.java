@@ -8,7 +8,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 public abstract class AbstractPushbackParser<T> extends AbstractParser<T> {
-    protected Deque<MarkWrapper> stack = new LinkedList<>();
+    protected final Deque<MarkWrapper> stack = new LinkedList<>();
     protected final Deque<Allocator.Resource<ByteBuffer>> dataDeque = new LinkedList<>();
 
     protected void pushBack() throws InternalException {

@@ -20,7 +20,7 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractParser<L
 
     @Override
     public void parse(Allocator.Resource<ByteBuffer> data) throws ParseException, InternalException {
-        if(status == Status.DONE) return;
+        if(status == Status.DONE  ||  status == Status.PUSH_BACK_DATA) return;
         status = Status.IN_PROGRESS;
 
         ByteBuffer byteBuffer = data.get();
@@ -33,14 +33,15 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractParser<L
                     if(byteBuffer.hasRemaining()) dataDeque.offer(data);
                     result.add(parser.result);
                     parser.reset();
-                } else if (parser.status == Status.PARSE_COMPLETE) {
+                } else if(parser.status == Status.PARSE_COMPLETE) {
                     result.add(parser.result);
                     status = Status.DONE;
                     return;
                 }
             } catch (ParseException exception) {
-                status = Status.DONE;
-                throw new ParseCompletePushBackSignalException(exception, dataDeque.peek());
+                status = Status.PUSH_BACK_DATA;
+                super.data = dataDeque.peek();
+                return;
             }
         }
     }
@@ -49,7 +50,7 @@ public class ZeroOrMore<T, P extends AbstractParser<T>> extends AbstractParser<L
     public void reset() {
         parser.reset();
         dataDeque.clear();
+        super.reset();
         result = new ArrayList<>();
-        status = Status.NONE;
     }
 }

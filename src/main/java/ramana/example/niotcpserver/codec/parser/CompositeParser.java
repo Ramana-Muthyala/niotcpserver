@@ -26,23 +26,19 @@ public abstract class CompositeParser<T> extends AbstractPushbackParser<T> {
             MarkWrapper markWrapper = new MarkWrapper(data, byteBuffer.position());
             while(byteBuffer.hasRemaining()) {
                 AbstractParser parser = parsers.get(index);
-                try {
-                    parser.parse(data);
-                    if(parser.status == Status.DONE) {
-                        stack.clear();
-                        markWrapper.mark(byteBuffer.position());
-                        index++;
-                        if(index == parsers.size()) {
-                            result = composeResult();
-                            status = Status.DONE;
-                            return;
-                        }
-                    } else {
-                        stack.offer(markWrapper);
+                parser.parse(data);
+                if(parser.status == Status.DONE) {
+                    stack.clear();
+                    markWrapper.mark(byteBuffer.position());
+                    index++;
+                    if(index == parsers.size()) {
+                        result = composeResult();
+                        status = Status.DONE;
+                        return;
                     }
-                } catch (ParseCompletePushBackSignalException exception) {
+                } else if (parser.status == Status.PUSH_BACK_DATA) {
                     stack.offer(markWrapper);
-                    pushBack(exception.pushBackPoint);
+                    pushBack((Allocator.Resource<ByteBuffer>) parser.getData());
                     index++;
                     if(index == parsers.size()) {
                         result = composeResult();
@@ -50,6 +46,8 @@ public abstract class CompositeParser<T> extends AbstractPushbackParser<T> {
                         return;
                     }
                     break;
+                } else {
+                    stack.offer(markWrapper);
                 }
             }
         }
