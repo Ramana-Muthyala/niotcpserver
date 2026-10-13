@@ -267,46 +267,21 @@ public class SslChannelOperations extends ChannelOperations {
         protected void process() throws IOException, InternalException {
             ByteBuffer sourceBuffer = source.get();
             ByteBuffer destinationBuffer = destination.get();
-            ArrayList<Allocator.Resource<ByteBuffer>> overflows = new ArrayList<>();
+            ArrayList<Allocator.Resource<ByteBuffer>> accumulator = new ArrayList<>();
             sslEngineResult = sslEngine.unwrap(sourceBuffer, destinationBuffer);
-            SSLEngineResult.Status resultStatus = sslEngineResult.getStatus();
-            while(sslEngineResult.bytesProduced() > 0
-                    ||  resultStatus == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-                if(resultStatus == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-                    destinationBuffer.flip();
-                    overflows.add(destination);
-                    destination = allocator.allocate(session.getApplicationBufferSize() + padding);
-                    destinationBuffer = destination.get();
-                }
+            while(sslEngineResult.bytesProduced() > 0) {
+                destinationBuffer.flip();
+                accumulator.add(destination);
+                destination = allocator.allocate(session.getApplicationBufferSize() + padding);
+                destinationBuffer = destination.get();
                 if(sourceBuffer.hasRemaining()) {
                     sslEngineResult = sslEngine.unwrap(sourceBuffer, destinationBuffer);
-                    resultStatus = sslEngineResult.getStatus();
                 } else {
                     break;
                 }
             }
-
-            if(sslEngineResult.bytesProduced() > 0) {
-                if(overflows.size() == 0) {
-                    result = destination;
-                } else {
-                    destinationBuffer.flip();
-                    Allocator.Resource<ByteBuffer> resource = allocator.allocate(destinationBuffer.limit() + getOverflowCapacity(overflows));
-                    ByteBuffer byteBuffer = resource.get();
-                    addOverflows(overflows, byteBuffer);
-                    byteBuffer.put(destinationBuffer);
-                    destination.release();
-                    result = resource;
-                }
-                return;
-            }
-
-            if(overflows.size() > 0) {
-                Allocator.Resource<ByteBuffer> resource = allocator.allocate(getOverflowCapacity(overflows));
-                ByteBuffer byteBuffer = resource.get();
-                addOverflows(overflows, byteBuffer);
-                destination.release();
-                result = resource;
+            result = copy(accumulator, destination);
+            if(result instanceof Allocator.Resource) {
                 return;
             }
 
@@ -327,19 +302,25 @@ public class SslChannelOperations extends ChannelOperations {
             result = 0;
         }
 
-        private void addOverflows(ArrayList<Allocator.Resource<ByteBuffer>> overflows, ByteBuffer byteBuffer) throws InternalException {
-            for (Allocator.Resource<ByteBuffer> overflow: overflows) {
-                byteBuffer.put(overflow.get());
-                overflow.release();
-            }
-        }
-
-        private int getOverflowCapacity(ArrayList<Allocator.Resource<ByteBuffer>> overflows) throws InternalException {
+        private Object copy(ArrayList<Allocator.Resource<ByteBuffer>> accumulator, Allocator.Resource<ByteBuffer> destinationResource) throws InternalException {
             int capacity = 0;
-            for (Allocator.Resource<ByteBuffer> overflow: overflows) {
-                capacity += overflow.get().limit();
+            for (Allocator.Resource<ByteBuffer> tmpResource: accumulator) {
+                capacity += tmpResource.get().limit();
             }
-            return capacity;
+            ByteBuffer destinationBuffer = destinationResource.get();
+            if(capacity == 0  &&  destinationBuffer.position() > 0) {
+                return destinationResource;
+            }
+            destinationBuffer.flip();
+            capacity += destinationBuffer.limit();
+            if(capacity == 0) return 0;
+            Allocator.Resource<ByteBuffer> resultResource = allocator.allocate(capacity);
+            ByteBuffer resultBuffer = resultResource.get();
+            for (Allocator.Resource<ByteBuffer> tmpResource: accumulator) {
+                resultBuffer.put(tmpResource.get());
+            }
+            resultBuffer.put(destinationBuffer);
+            return resultResource;
         }
     }
 
