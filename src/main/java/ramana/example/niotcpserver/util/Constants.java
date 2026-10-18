@@ -9,6 +9,8 @@ public interface Constants {
     long CHANNEL_CLOSE_TIMEOUT = 5000; // milliseconds
     long SSL_CHANNEL_CLOSE_TIMEOUT = 10000; // milliseconds
 
+    int WRAP_TASK_BUFFER_CAPACITY_FOR_NO_SOURCE_DATA = 0;
+
     int READ_BUFFER_CAPACITY = 1 << 12;
     int CACHE_NORMAL_CAPACITY = 1 << 16;
     int CACHE_SMALL_SIZE = 256;

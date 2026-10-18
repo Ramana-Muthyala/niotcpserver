@@ -28,6 +28,9 @@ Http codec: Minimalistic and lenient implementation is given for demonstration p
 SSL notes: If self-signed certificate expires, it has to be regenerated.
     Keystore path: src/main/resources/keyStore.jks
     For passphrase: Refer: src/main/java/ramana/example/niotcpserver/util/SslContextUtil.java
+    For usage of javax.net.ssl.SSLEngine: refer:
+        src/main/java/ramana/example/niotcpserver/io/SslChannelOperations.java
+        src/main/java/ramana/example/niotcpserver/io/SslEngineWrapper.java
 
 For examples and test cases:
     Refer test folder: src/test/java

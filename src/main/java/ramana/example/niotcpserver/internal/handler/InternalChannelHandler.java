@@ -52,7 +52,7 @@ public class InternalChannelHandler {
             channelOperations.flush();
         } catch (OutOfMemoryError | IOError | IOException | RuntimeException | InternalException exception) {
             logger.log(Level.INFO, exception.getMessage(), exception);
-            channelOperations.close(true);
+            channelOperations.close();
         }
     }
 

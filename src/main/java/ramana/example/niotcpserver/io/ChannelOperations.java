@@ -20,7 +20,7 @@ public class ChannelOperations {
     public final SocketChannel channel;
     protected final Allocator<ByteBuffer> allocator;
     protected final Queue<Allocator.Resource<ByteBuffer>> outboundQueue = new LinkedList<>();
-    protected long closeTicker;
+    private Long closeInitiatedAt;
     protected static long closeTimeout = Constants.CHANNEL_CLOSE_TIMEOUT;
 
     public ChannelOperations(Allocator<ByteBuffer> allocator, SelectionKey sk) {
@@ -30,12 +30,12 @@ public class ChannelOperations {
     }
 
     public void flushAndClose() {
-        closeTicker = System.currentTimeMillis();
         try {
+            initiateClose();
             flush();
         } catch (OutOfMemoryError | IOError | IOException | RuntimeException | InternalException exception) {
             logger.log(Level.INFO, exception.getMessage(), exception);
-            close(true);
+            close();
         }
     }
 
@@ -43,10 +43,8 @@ public class ChannelOperations {
         return !channel.isOpen();
     }
 
-    public void close(boolean forceClose) {
+    public void close() {
         if(isClosed()) return;
-        if(!forceClose  &&  outboundQueue.size() != 0
-                &&  (System.currentTimeMillis() - closeTicker) < closeTimeout) return;
         releaseResources();
         try {
             channel.close();
@@ -78,8 +76,22 @@ public class ChannelOperations {
                 resource.release();
             }
         }
-        if(outboundQueue.size() == 0) clearWriteInterest();
-        if(closeTicker > 0) close(false);
+        if(outboundQueue.isEmpty()) clearWriteInterest();
+
+        closeIfInitiated();
+    }
+
+    public void closeIfInitiated() {
+        if(isClosed()  ||  closeInitiatedAt == null) return;
+        if(outboundQueue.isEmpty()  ||  (System.currentTimeMillis() - closeInitiatedAt) > closeTimeout) {
+            close();
+        }
+    }
+
+    public void initiateClose() {
+        if(closeInitiatedAt == null) {
+            closeInitiatedAt = System.currentTimeMillis();
+        }
     }
 
     protected void releaseResources() {
