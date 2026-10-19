@@ -55,10 +55,11 @@ public class AsyncServer {
 
             TriConsumer<String, String, Context.OnWrite> callback0 = (message, result, context0) -> {
                 logger.info(message + result);
-                Allocator.Resource<ByteBuffer> resource = context0.allocator().allocate(1024);
+                byte[] resultAsBytes = result.getBytes();
+                Allocator.Resource<ByteBuffer> resource = context0.allocator().allocate(resultAsBytes.length);
                 try {
                     ByteBuffer buffer = resource.get();
-                    buffer.put(result.getBytes());
+                    buffer.put(resultAsBytes);
                     context0.write(resource);
                     context0.close();
                 } catch (InternalException exception) {
@@ -162,10 +163,14 @@ public class AsyncServer {
 
         @Override
         public void onRead(Context.OnRead context, Object data) throws InternalException {
-            String STATUS_200_OK = "HTTP/1.1 200 OK";
+            /*
+            * Responses may be chunked and could be received in multiple onRead() calls.
+            * Reading the first line of response and closing.
+            * */
             response = Util.toString(data);
-            if(response.startsWith(STATUS_200_OK)) {
-                response = STATUS_200_OK;
+            int index = response.indexOf("\n");
+            if(index != -1) {
+                response = response.substring(0, index);
             }
             context.close();
         }
@@ -179,10 +184,11 @@ public class AsyncServer {
         @Override
         public void onRead(Context.OnRead context, Object data) throws InternalException {
             logger.info(data.toString());
-            Allocator.Resource<ByteBuffer> resource = context.allocator().allocate(1024);
+            byte[] dataAsBytes = data.toString().getBytes();
+            Allocator.Resource<ByteBuffer> resource = context.allocator().allocate(dataAsBytes.length);
             try {
                 ByteBuffer buffer = resource.get();
-                buffer.put(data.toString().getBytes());
+                buffer.put(dataAsBytes);
                 context.write(resource);
                 context.close();
             } catch (InternalException exception) {

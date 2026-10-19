@@ -222,6 +222,7 @@ public class SslEngineWrapper {
                     destinationBuffer.flip();
                     accumulator.add(destination);
                     destination = allocator.allocate(session.getApplicationBufferSize());
+                    destinationBuffer = destination.get();
                 }
             }
             result.value = copy(accumulator, destination);
