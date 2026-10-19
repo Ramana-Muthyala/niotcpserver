@@ -20,7 +20,7 @@ public class SslEngineWrapper {
     private final SslChannelOperations channelOperations;
     private Long closeInitiatedAt;
     private boolean closed;
-    public boolean gracefulCloseInProgress;
+    public boolean gracefulCloseInitiated;
 
     public SslEngineWrapper(SSLEngine sslEngine, SslChannelOperations channelOperations, Allocator<ByteBuffer> allocator, Allocator<ByteBuffer> directAllocator) {
         this.sslEngine = sslEngine;
@@ -59,7 +59,7 @@ public class SslEngineWrapper {
     }
 
     public void gracefulClose() throws IOException, InternalException {
-        gracefulCloseInProgress = true;
+        gracefulCloseInitiated = true;
         sslEngine.closeOutbound();
         while(!sslEngine.isOutboundDone()) {
             Allocator.Resource<ByteBuffer> tmpSource = allocator.allocate(Constants.WRAP_TASK_BUFFER_CAPACITY_FOR_NO_SOURCE_DATA);

@@ -73,7 +73,7 @@ public class SslChannelOperations extends ChannelOperations {
     @Override
     public void flush() throws IOException, InternalException {
         if(!writeToChannel(pendingWrite)) return;
-        if(sslEngineWrapper.gracefulCloseInProgress) {
+        if(sslEngineWrapper.gracefulCloseInitiated) {
             sslEngineWrapper.closeIfInitiated();
             return;
         }
