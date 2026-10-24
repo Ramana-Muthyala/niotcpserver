@@ -34,6 +34,7 @@ public class HttpsClient {
                     "Host:" + host + "\r\n" +
                     "User-Agent:NIOTCPServer/1.0\r\n" +
                     "Accept:*/*\r\n" +
+                    "Connection:Close\r\n" +
                     "\r\n";
             buffer.put(request.getBytes());
             context.write(resource);
